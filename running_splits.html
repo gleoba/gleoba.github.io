@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+
+<body ng-app="myApp" ng-controller="sgmntsCtrl">
+    <style>
+        .nxt-bordered tr,
+        .nxt-table-all tr {
+            border-bottom: 1px solid #ddd
+        }
+        
+        .nxt-border {
+            border: 1px solid #ccc!important
+        }
+        
+        .nxt-btn,
+        .nxt-button {
+            border: none;
+            display: inline-block;
+            outline: 0;
+            padding: 2px 4px;
+            vertical-align: middle;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            background-color: inherit;
+            text-align: center;
+            cursor: pointer;
+            white-space: nowrap
+        }
+        
+        .nxt-btn:hover {
+            box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+        }
+        
+        .nxt-btn,
+        .nxt-button {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none
+        }
+        
+        .nxt-disabled,
+        .nxt-btn:disabled,
+        .nxt-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.3
+        }
+        
+        .nxt-disabled *,
+         :disabled * {
+            pointer-events: none
+        }
+        
+        .nxt-btn.nxt-disabled:hover,
+        .nxt-btn:disabled:hover {
+            box-shadow: none
+        }
+        
+        <!-- .nxt-btn {
+            width: 100%
+        }
+        
+        -->.nxt-container2:after,
+        .nxt-container:before .nxt-container2 {
+            padding: 0.01em 16px
+        }
+        
+        .nxt-container {
+            padding: 1px 16px;
+            border: 1px solid green;
+            margin: 10px;
+        }
+        
+        .nxt-inner-block-l1,
+        .nxt-inner-block-l2 {
+            padding: 0.08em 16px;
+            border: 1px solid #8FB8DF;
+            margin: 10px;
+        }
+        
+        .nxt-inner-block-l2 {
+            background-color: #DBF8DC;
+        }
+        
+        .nxt-green:hover {
+            color: #fff!important;
+            background-color: #4CAF50!important
+        }
+        
+        .nxt-red:hover {
+            color: #fff!important;
+            background-color: red!important
+        }
+        
+        .nxt-input {
+            padding: 8px;
+            border: none;
+            display: block;
+            border-bottom: 1px solid #ccc
+        }
+        
+        .nxt-input-small {
+            padding: 8px;
+            border: none;
+            border-bottom: 1px solid #ccc;
+            width: 80px;
+        }
+        
+        .nxt-ripple:active {
+            opacity: 0.5
+        }
+        
+        .nxt-ripple {
+            transition: opacity 0s
+        }
+        
+        .nxt-striped tbody tr:nth-child(even) {
+            background-color: #f1f1f1
+        }
+        
+        .nxt-table td,
+        .nxt-table th,
+        .nxt-table-all td,
+        .nxt-table-all th {
+            padding: 8px 8px;
+            display: table-cell;
+            text-align: right;
+            vertical-align: top
+        }
+        
+        .nxt-table th:first-child,
+        .nxt-table td:first-child,
+        .nxt-table-all th:first-child,
+        .nxt-table-all td:first-child {
+            padding-left: 5px
+        }
+        
+        .nxt-table,
+        .nxt-table-all {
+            border-collapse: collapse;
+            border-spacing: 0;
+            display: table
+        }
+        
+        .nxt-table-all {
+            border: 1px solid #ccc
+        }
+        
+        .nxt-table-all tr:nth-child(even) {
+            background-color: #f1f1f1
+        }
+        
+        .nxt-table-all tr:nth-child(odd) {
+            background-color: #fff
+        }
+        
+         ::-webkit-file-upload-button {
+            -webkit-appearance: button;
+            font: inherit
+        }
+        
+         ::-webkit-input-placeholder {
+            color: inherit;
+            opacity: 0.54
+        }
+        
+        [type=checkbox],
+        [type=radio] {
+            padding: 0
+        }
+        
+        [type=number]::-webkit-inner-spin-button,
+        [type=number]::-webkit-outer-spin-button {
+            height: auto
+        }
+        
+        [type=search]::-webkit-search-cancel-button,
+        [type=search]::-webkit-search-decoration {
+            -webkit-appearance: none
+        }
+        
+        [type=search] {
+            -webkit-appearance: textfield;
+            outline-offset: -2px
+        }
+        
+        article,
+        aside,
+        details,
+        figcaption,
+        figure,
+        footer,
+        header,
+        main,
+        menu,
+        nav,
+        section,
+        summary {
+            display: block
+        }
+        
+        button,
+        html [type=button],
+        [type=reset],
+        [type=submit] {
+            -webkit-appearance: button
+        }
+        
+        button,
+        input,
+        select,
+        textarea {
+            font: inherit;
+            margin: 0
+        }
+        
+        optgroup {
+            font-weight: bold
+        }
+        
+        button,
+        input {
+            overflow: visible
+        }
+        
+        button,
+        select {
+            text-transform: none
+        }
+        
+        button:-moz-focusring,
+        [type=button]:-moz-focusring,
+        [type=reset]:-moz-focusring,
+        [type=submit]:-moz-focusring {
+            outline: 1px dotted ButtonText
+        }
+        
+        button::-moz-focus-inner,
+        [type=button]::-moz-focus-inner,
+        [type=reset]::-moz-focus-inner,
+        [type=submit]::-moz-focus-inner {
+            border-style: none;
+            padding: 0
+        }
+        
+        fieldset {
+            border: 1px solid #c0c0c0;
+            margin: 0 2px;
+            padding: .35em .625em .75em
+        }
+        
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: "Segoe UI", Arial, sans-serif;
+            font-weight: 400;
+            margin: 10px 0
+        }
+        
+        .nxt-wide {
+            letter-spacing: 4px
+        }
+        
+        h1 {
+            font-size: 36px
+        }
+        
+        h2 {
+            font-size: 30px
+        }
+        
+        h3 {
+            font-size: 24px
+        }
+        
+        h4 {
+            font-size: 20px
+        }
+        
+        h5 {
+            font-size: 18px
+        }
+        
+        h6 {
+            font-size: 16px
+        }
+        
+        .nxt-serif {
+            font-family: serif
+        }
+        
+        hr {
+            border: 0;
+            border-top: 1px solid #eee;
+            margin: 20px 0
+        }
+        
+        html,
+        body {
+            font-family: Verdana, sans-serif;
+            font-size: 15px;
+            line-height: 1.5
+        }
+        
+        html {
+            overflow-x: hidden
+        }
+        
+        html {
+            -ms-text-size-adjust: 100%;
+            -webkit-text-size-adjust: 100%
+        }
+        
+        body {
+            margin: 0
+        }
+        
+        html {
+            box-sizing: border-box
+        }
+        
+        *,
+        *:before,
+        *:after {
+            box-sizing: inherit
+        }
+    </style>
+
+    <div class="nxt-container">
+        <h2>Running Sections</h2>
+        <table class="nxt-table nxt-bordered nxt-striped">
+            <thead>
+                <th></th>
+                <th>Name</th>
+                <th>Duration (min)</th>
+                <th>Pace (min/km)</th>
+                <th>Repeat (times)</th>
+                <th>Distance (km)</th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </thead>
+            <tbody>
+                <tr ng-repeat="item in running_sgmnts">
+                    <td>
+                        <button class="nxt-btn nxt-ripple" ng-click="editItem($index)">&#9998; Edit</button>
+                    </td>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.duration }}</td>
+                    <td>{{ item.pace | secondsToDateTime | date:'mm:ss' }}</td>
+                    <td>{{ item.times }}</td>
+                    <td>{{ (item.duration * item.times) / (item.pace / 60 )| number:2 }}</td>
+                    <td>
+                        <button class="nxt-btn nxt-red nxt-ripple" ng-click="running_sgmnts.splice($index, 1)">&#9746;</button>
+                    </td>
+                    <td>
+                        <button class="nxt-btn nxt-green nxt-ripple" ng-click="swapItems($index, $index-1)">&#8679;</button>
+                    </td>
+                    <td>
+                        <button class="nxt-btn nxt-green nxt-ripple" ng-click="swapItems($index, $index+1)">&#8681;</button>
+                    </td>
+                    <td>
+                        <button class="nxt-btn nxt-green nxt-ripple" ng-click="editItem('new')">&#10010;</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>TOTAL:</td>
+                    <td></td>
+                    <td>{{ getTotalDuration() | secondsToDateTime | date:'mm:ss' }} (hr:mm)</td>
+                    <td></td>
+                    <td></td>
+                    <td>{{ getTotalDistance() | number:2 }}</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td><button class="nxt-btn nxt-green nxt-ripple" ng-click="editItem('new')">&#10010;</button>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+
+        <form ng-hide="hideform">
+            <div class="nxt-inner-block-l1">
+                <h4 ng-show="edit">Add New Section:</h3>
+                    <h4 ng-hide="edit">Edit Section:</h3>
+                        <label>Name:</label>
+                        <input class="nxt-input nxt-border" type="text" ng-model="fName">
+                        <br>
+
+                        <div class="nxt-inner-block-l2">
+                            <label>Duration (in minutes):</label>
+                            <input class="nxt-input nxt-border" type="number" ng-model="fDuration" placeholder="5">
+                            <label>Pace (min/km):</label>
+                            <br>
+                            <label>minutes:</label>
+                            <input class="nxt-input-small nxt-border" type="number" ng-model="fPaceMin" placeholder="5" min="0" max="240">
+                            <label>seconds:</label>
+                            <input class="nxt-input-small nxt-border" type="number" ng-model="fPaceSec" placeholder="0" min="0" max="60">
+
+                        </div>
+                        <label>Repeat:</label>
+                        <input class="nxt-input-small nxt-border" type="number" ng-model="fTimes" placeholder="1">
+                        <br>
+                        <label>Distance (km):</label>
+                        <input class="nxt-input nxt-border" type="text" value="{{ ((fDuration * fTimes) / (fPace / 60)) | number:2 }}  " ng-disabled="true">
+                        <button class="nxt-btn nxt-green nxt-ripple" ng-disabled="error || incomplete" ng-click="updateItem(fId,fName,fDuration,fPace,fTimes)">&#10004; Save Changes</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        var app = angular.module('myApp', []).controller('sgmntsCtrl', ['$scope', '$log', function($scope, $log) {
+            $scope.$log = $log;
+            $scope.fId = 'new';
+            $scope.fName;
+            $scope.fDuration = 0;
+            $scope.fPace = 300;
+            $scope.fPaceMin = 5;
+            $scope.fPaceSec = 0;
+            $scope.fTimes = 1;
+            $scope.running_sgmnts = [{
+                name: 'Warm-up',
+                duration: 10,
+                pace: 300,
+                times: 1
+            }, {
+                name: 'Cool-down',
+                duration: 5,
+                pace: 360,
+                times: 1
+            }];
+            $scope.hideform = true;
+            $scope.edit = true;
+            $scope.error = false;
+            $scope.incomplete = false;
+            $scope.updateItem = function(id, iName, iDuration, iPace, iTimes) {
+                if (id == 'new') {
+                    length = $scope.running_sgmnts.length;
+                    $scope.running_sgmnts.push({
+                        name: iName,
+                        duration: iDuration,
+                        pace: iPace,
+                        times: iTimes
+                    });
+                } else {
+                    $scope.running_sgmnts[id].name = iName;
+                    $scope.running_sgmnts[id].duration = iDuration;
+                    $scope.running_sgmnts[id].pace = iPace;
+                    $scope.running_sgmnts[id].times = iTimes;
+                }
+
+                for (var i = 0; i < $scope.running_sgmnts.length; i++) {
+                    var sgmnt = $scope.running_sgmnts[i];
+                    $log.log('{ ' + sgmnt.name + ',' + sgmnt.duration + ',' + sgmnt.pace + ',' + sgmnt.times + '}');
+                }
+
+                $scope.hideform = true;
+            }
+            $scope.editItem = function(id) {
+                $scope.hideform = false;
+                $scope.fId = id;
+                if (id == 'new') {
+                    $scope.edit = true;
+                    $scope.incomplete = true;
+                    $scope.fName = 'Run';
+                    $scope.fDuration = 5;
+                    $scope.fPace = 300;
+                    $scope.fPaceMin = 5;
+                    $scope.fPaceSec = 0;
+                    $scope.fTimes = 1;
+                } else {
+                    $scope.edit = false;
+                    $scope.fName = $scope.running_sgmnts[id].name;
+                    $scope.fDuration = $scope.running_sgmnts[id].duration;
+                    $scope.fTimes = $scope.running_sgmnts[id].times;
+                    $scope.fPace = $scope.running_sgmnts[id].pace;
+                    $scope.fPaceMin = $scope.fPace / 60;
+                    $scope.fPaceSec = $scope.fPace % 60;
+                }
+            };
+
+            $scope.getTotalDistance = function() {
+                var total = 0;
+                for (var i = 0; i < $scope.running_sgmnts.length; i++) {
+                    var sgmnt = $scope.running_sgmnts[i];
+                    total += (sgmnt.duration * sgmnt.times) / (sgmnt.pace / 60);
+                }
+                return total;
+            };
+
+            $scope.getTotalDuration = function() {
+                var total = 0;
+                for (var i = 0; i < $scope.running_sgmnts.length; i++) {
+                    var sgmnt = $scope.running_sgmnts[i];
+                    total += (sgmnt.duration * sgmnt.times);
+                }
+                return total;
+            };
+
+            $scope.$watch('fDuration', function() {
+                $scope.test();
+            });
+            $scope.$watch('fPaceMin', function() {
+                if ($scope.fPaceMin < 0 || $scope.fPaceMin > 240) {
+                    $scope.error = true;
+                } else {
+                    $scope.error = false;
+                    $scope.fPace = $scope.fPaceMin * 60 + $scope.fPaceSec;
+                }
+            });
+            $scope.$watch('fPaceSec', function() {
+                if ($scope.fPaceSec < 0 || $scope.fPaceSec > 60) {
+                    $scope.error = true;
+                } else {
+                    $scope.error = false;
+                    $scope.fPace = $scope.fPaceMin * 60 + $scope.fPaceSec;
+                }
+            });
+            $scope.swapItems = function(idxA, idxB) {
+                length = $scope.running_sgmnts.length;
+                if (idxA < 0 || idxB < 0 || length == 0 || idxA > length - 1 || idxB > length - 1) {
+                    $log.info('cant swap: ' + idxA + ' and ' + idxB + ', length is: ' + length);
+                } else {
+                    itemA = $scope.running_sgmnts[idxA];
+                    itemB = $scope.running_sgmnts[idxB];
+
+                    $scope.running_sgmnts[idxB] = itemA;
+                    $scope.running_sgmnts[idxA] = itemB;
+                }
+            }
+            $scope.test = function() {
+                // $log.log('test function is disabled');
+                //if ($scope.passw1 !== $scope.passw2) {
+                //  $scope.error = true;
+                // }
+                // else {
+                $scope.error = false;
+                //}
+
+                $scope.incomplete = false;
+                //if ($scope.edit && (!$scope.fDuration.length ||
+                //    !$scope.fPace.length)) {
+                //      $scope.incomplete = true;
+                //}
+            };
+
+        }])
+
+        app.filter('secondsToDateTime', [function() {
+            return function(seconds) {
+                return new Date(1970, 0, 1).setSeconds(seconds);
+            };
+        }])
+    </script>
+
+</body>
+
+</html>
