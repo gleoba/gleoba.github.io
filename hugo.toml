@@ -83,9 +83,20 @@ vercelAnalytics = false
 [params.analytics.googleAnalytics]
 code = "G-1JFJR82J0V"
 enabled = true
+
+
+## analytics from the TEMPLATE - not working
 [params.analytics.googleTagManager]
-code = "GTM-XXXXX"
-enabled = false
+code = "GTM-NH9C67B5"
+enabled = true
+
+## analytics UPDATED - working
+[params.analytics.google_tag_manager]
+id = "GTM-NH9C67B5"
+code = "GTM-NH9C67B5"
+enabled = true
+
+
 
 [build]
 [build.buildStats]
