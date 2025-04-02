@@ -1,0 +1,14 @@
+.mylang__lang {
+    font-weight: bold;
+    flex: none;
+}
+
+.mylang__level {
+    flex: none;
+}
+
+.mylang {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: row
+}

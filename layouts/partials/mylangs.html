@@ -1,0 +1,33 @@
+{{- $contextType := printf "%T" . -}}
+{{- $isShortcode := (eq $contextType "*hugolib.ShortcodeWithPage") -}}
+
+{{- /* Title */}}
+{{- $title := "" -}}
+
+{{- if $isShortcode }}
+  {{- $title = .Get "title" | default ( i18n "mylang__lang" ) -}}
+{{ else }}
+  {{- $title = i18n "mylang__lang" -}}
+{{ end }}
+
+<section
+  id="mylang"
+  class="section section--border-bottom rad-animation-group"
+>
+  <div class="container">
+    <div class="row rad-fade-down">
+      <h2>{{ $title }}</h2>
+      <div class="row pt-2 pt-md-4">
+        {{ range where .Site.RegularPages.ByDate "Type" "languages" }}
+        <li>
+          <div class="mylang" >
+            <div class="mylang__lang">{{  .Params.mylang }}</div>
+            <div>:&nbsp;</div>
+            <div class="mylang__level">{{ .Params.level }}</div>
+          </div>
+        </li>
+        {{ end }}
+      </div>
+    </div>
+  </div>
+</section>

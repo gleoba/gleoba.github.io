@@ -1,0 +1,73 @@
+## Meta tags
+- id: "meta_title"
+  translation: "Gleoba's Pile - a personal site by Gleb Gotgelf"
+- id: "meta_description"
+  translation: "This is a personal site by Gleb Gotgelf with a portfolio, blog and more."
+- id: "meta_keywords"
+  translation: "personal site, portfolio, cv, blog, gleb gotgelf, gleoba"
+- id: "meta_author"
+  translation: "Gleoba"
+- id: "meta_image"
+  translation: "/img/general/og-image.jpg"
+
+## Header
+
+- id: "logo_alt"
+  translation: "Gleoba logo"
+
+- id: "logo_text1"
+  translation: "Gleoba's"
+
+- id: "logo_text2"
+  translation: "Pile"
+
+## General
+- id: "skipToMainContent"
+  translation: "Skip to main content"
+
+- id: "toggle_navigation"
+  translation: "Toggle navigation"
+
+## Footer
+- id: "footer_notice"
+  translation: "© Gleoba. No strings attached. All rights reserved."
+
+- id: "language"
+  translation: "Language"
+
+- id: "toggle_theme"
+  translation: "Toggle theme"
+
+- id: "theme_light"
+  translation: "☀️ Light"
+- id: "theme_dark"
+  translation: "🌑 Dark"
+- id: "theme_auto"
+  translation: "✨ Auto"
+
+## Homepage head title
+- id: "head_title"
+  translation: "Gleoba's Pile"
+
+- id: "head_description"
+  translation: "A personal site by Gleb Gotgelf with a portfolio, blog and more."
+
+
+## Blog
+- id: "read_more"
+  translation: "Read more"
+
+- id: "published_on"
+  translation: "Published on "
+
+- id: "continue_reading"
+  translation: "Continue reading"
+
+## 404 Page
+- id: "404_title"
+  translation: "Page not found"
+- id: "404_description"  
+  translation: "Sorry, but the page you were looking for could not be found."
+- id: "404_button"
+  translation: "Back to homepage"
+
