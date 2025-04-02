@@ -3,7 +3,7 @@ date: '2023-08-01T00:00:00+00:00' # date in which the content is created - defau
 title: 'Belgacom'
 draft: false # set to "true" if you want to hide the content 
 
-link: "https://www.adrianmoreno.info" # optional URL
+link: "https://www.linkedin.com/in/gleb-gotgelf/" # optional URL
 
 params:
     logo:

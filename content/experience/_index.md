@@ -5,7 +5,7 @@ button1_url: https://github.com/gleoba
 button1_icon: icon-square-github
 
 button2_text: LinkedIn
-button2_url: https://linkedin.com/in/adrianmoreno
+button2_url: https://www.linkedin.com/in/gleb-gotgelf/
 button2_icon: icon-linkedin
 ---
 
