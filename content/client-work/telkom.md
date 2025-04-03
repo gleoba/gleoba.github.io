@@ -6,6 +6,6 @@ draft: false # set to "true" if you want to hide the content
 params:
     logo:
       src: "images/clients/color/telkom-communications-logo.png"
-      scale: 0.2
+      scale: 0.1
 
 ---

@@ -8,6 +8,6 @@ link: "https://www.linkedin.com/in/gleb-gotgelf/" # optional URL
 params:
     logo:
       src: "images/clients/color/belgacom-logo.png"
-      scale: 0.2
+      scale: 0.1
 
 ---
