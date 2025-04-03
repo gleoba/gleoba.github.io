@@ -10,8 +10,8 @@ draft = false
     subtitle="Architecting <code>Tomorrow's</code> Solutions"
     buttonText="Email"
     description="As a Lead Software Architect with a passion for transformative technologies, I specialize in creating scalable, resilient systems that solve real business challenges.<br/>My approach combines technical expertise with strategic vision - designing solutions that not only meet current demands but anticipate future needs. From cloud migrations to AI integration, I've guided organizations through their most complex technical evolutions.<br/>My portfolio showcases enterprise-scale projects across hybrid environments, demonstrating how thoughtful architecture can unlock new possibilities.<br/>I believe great systems aren't just built, they're carefully crafted through collaboration, insight, and forward thinking."
-    imgSrc="images/showcase/showcase.png"
-    imgScale="0.3"
+    imgSrc="images/showcase/landing-page-1.png"
+    imgScale="0.2"
  >}}
 
 {{< platform-links >}}
@@ -30,7 +30,7 @@ draft = false
     button_text="LinkedIn"
     button_url="https://www.linkedin.com/in/gleb-gotgelf/"
     imgSrc="images/about/my-user-picture.png"
-    imgScale="0.5"
+    imgScale="0.7"
  >}}
 
 {{< client-and-work-section
