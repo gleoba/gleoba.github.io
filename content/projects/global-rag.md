@@ -1,9 +1,7 @@
 ---
-date: '2023-08-01T00:00:00+00:00' # date in which the content is created - defaults to "today"
-title: 'Chatbot with LLM RAG'
+date: '2023-08-01T00:00:00+00:00'
+title: 'AI-Powered Knowledge Assistant'
 draft: false # set to "true" if you want to hide the content 
-
-link: "https://www.linkedin.com/in/gleb-gotgelf/" # optional URL to link the logo to
 
 params:
     button:
@@ -11,13 +9,9 @@ params:
         btnText: "Linked"
         URL: "https://www.linkedin.com/in/gleb-gotgelf/"
     image:
-        src: "images/works/disaster-recovery-small.png"
-        scale: 0.5
-
-## The content is used for the description of the project
+        src: "images/works/project-rag-2.png"
+        scale: 0.7
 ---
 
-Multi-regional Disaster Recovery for operational management and observability stack.
-In my role as the Lead Software Architect responsible for the ACMP I was assigned to design architecture for the Multi-regional Disaster Recovery for operational managment and observability stack.
-
-SaaS Mutli-Tenant Integration
+<code>Challenge: </code>Create an assistant chatbot to help users efficiently find answers within internal knowledge repositories.<br/>
+<code>Solution: </code>I designed an intelligent assistant using Azure OpenAI that transforms how employees access company information. With RAG architecture, the solution provides contextually-aware semantic search, allowing the system to understand user intent and deliver precise information from across the knowledge ecosystem. Users simply ask questions in natural language and receive accurate responses grounded in verified internal documentation. This enterprise-ready implementation significantly improves knowledge accessibility without compromising data privacy, demonstrating how AI can enhance productivity while maintaining information security and accuracy.
