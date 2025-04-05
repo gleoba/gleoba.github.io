@@ -11,8 +11,8 @@ params:
         btnText: "Linked"
         URL: "https://www.linkedin.com/in/gleb-gotgelf/"
     image:
-        src: "images/works/integration-platform-2.png"
-        scale: 0.7
+        src: "images/works/integration-platform-5.png"
+        scale: 0.6
 ---
 
 <code>Challenge: </code>Create a secure, scalable integration layer connecting diverse enterprise environments with central services while supporting global deployment scenarios.<br/>
