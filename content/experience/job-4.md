@@ -1,12 +1,12 @@
 ---
 date: 2023-09-01T00:00:00+02:00
 draft: false
-title: "Lead atomIQ Architect"
+title: "Lead Architect"
 jobTitle: "Lead Software Architect"
 company: "Amdocs"
 location: "Israel"
 duration: "Sep 2021 – Sep 2023"
-companyLogo: "images/experience/amdocs-logo.png"
+companyLogo: "images/experience/amdocs-logo-small.png"
 
 ---
 
@@ -16,3 +16,5 @@ companyLogo: "images/experience/amdocs-logo.png"
 - Developed multi-cloud globally scalable SaaS architecture across AWS and Azure, achieving 99.9% uptime and ensuring regional disaster recovery regulations compliance.
 - Acted as the primary advisor for Information Security and Compliance, ensuring 100% adherence to regional regulations across tens of enterprise customers worldwide.
 - Designed and deployed a Generative AI-powered assistant with Azure OpenAI API, providing end-users with unprecedented capabilities to query the internal knowledge base.
+
+Skils: `AWS`, `Azure`, `PaaS`, `IaC`, `Terraform`, `Kubernetes`, `Microservices`, `Serverless`, `Distributed Systems`, `Event Driven Architecture`, `Platform Architecture`, `Open-Srouce`, `SaaS`, `Agile`, `Disaster Recovery`,  `SLA`, `KPIs`, `GEN AI`, `RAG`, `SSO`, `IDM`, `PAM`

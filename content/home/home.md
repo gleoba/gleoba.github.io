@@ -10,8 +10,8 @@ draft = false
     subtitle="Architecting <code>Tomorrow's</code> Solutions"
     buttonText="Email"
     description="As a Lead Software Architect with a passion for transformative technologies, I specialize in creating scalable, resilient systems that solve real business challenges.<br/>My approach combines technical expertise with strategic vision - designing solutions that not only meet current demands but anticipate future needs. From cloud migrations to AI integration, I've guided organizations through their most complex technical evolutions.<br/>My portfolio showcases enterprise-scale projects across hybrid environments, demonstrating how thoughtful architecture can unlock new possibilities.<br/>I believe great systems aren't just built, they're carefully crafted through collaboration, insight, and forward thinking."
-    imgSrc="images/showcase/landing-page-1.png"
-    imgScale="0.15"
+    imgSrc="images/showcase/landing-page-2.png"
+    imgScale="0.2"
  >}}
 
 {{< platform-links >}}
@@ -39,7 +39,7 @@ draft = false
 {{< experience-section
     title="Cloud Solution and Software Architect"
     intro_title="Profile"
-    intro_description="Lead Software Architect with extensive experience delivering innovative, enterprise-level solutions and driving cloud and AI transformations. Skilled at leading teams, solving complex challenges, and building future-ready products and systems.<br/>A quick learner with exceptional analytical thinking, adept at deep diving into technical challenges while maintaining a strategic, broad vision. Experienced in leading globally scalable SaaS solutions that directly impact enterprise customers worldwide. Proficient in designing highly available systems in hybrid-cloud environments (on-prem, AWS, Azure) while ensuring alignment with business objectives. Passionate about leveraging cutting-edge technologies to drive innovation and deliver impactful results." 
+    intro_description="Lead Software Architect with extensive experience delivering innovative, enterprise-level solutions and driving cloud and AI transformations. Skilled at leading teams, solving complex challenges, and building future-ready products and systems.<br/>A quick learner with exceptional analytical thinking, adept at deep-diving into technical challenges while maintaining a strategic, broad vision. Experienced in leading globally scalable SaaS solutions that directly impact enterprise customers worldwide. Proficient in designing highly available systems in hybrid-cloud environments (on-prem, AWS, Azure) while ensuring alignment with business objectives. Passionate about leveraging cutting-edge technologies to drive innovation and deliver impactful results." 
     
     button1_text="LinkedIn"
     button1_url="https://www.linkedin.com/in/gleb-gotgelf/"
