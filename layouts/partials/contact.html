@@ -1,0 +1,76 @@
+{{- $contextType := printf "%T" . -}}
+{{- $isShortcode := (eq $contextType "*hugolib.ShortcodeWithPage") -}}
+
+{{/* ---------------------------------------------------------------------------
+     CONTACT FORM ELEMENTS
+     --------------------------------------------------------------------------- */}}
+{{- /* Title */}}
+{{- $title := "" -}}
+{{- if $isShortcode }}
+    {{- $title = .Get "title" -}}
+{{ else }}
+    {{- $title = i18n "contact_title" -}}
+{{ end }}
+
+{{/* ---------------------------------------------------------------------------
+     CONTACT INFO
+     --------------------------------------------------------------------------- */}}
+
+{{- /* Address */}}
+{{- $addressTitle := "" -}}
+{{- $addressText := "" -}}
+{{- if $isShortcode }}
+    {{- $addressTitle = .Get "contact_address_title" -}}
+    {{- $addressText = .Get "contact_address_address" -}}
+{{ else }}
+    {{- $addressTitle = i18n "contact_address_title" -}}
+    {{- $addressText = i18n "contact_address_address" -}}
+{{ end }}
+
+
+{{/* ---------------------------------------------------------------------------
+    BUTTON
+    --------------------------------------------------------------------------- */}}
+{{- $btnURL := "" -}}
+{{- $btnIcon := "" -}}
+{{- $btnText := "" -}}
+
+{{- if $isShortcode }}
+ {{- $btnURL = .Get "button_url" | default .Site.Data.homepage.about.button.URL -}}
+ {{- $btnIcon = .Get "button_icon" | default .Site.Data.homepage.about.button.icon -}}
+ {{- $btnText = .Get "button_text" | default false -}}
+{{ else }}
+ {{- $btnURL = .Site.Data.homepage.about.button.URL -}}
+ {{- $btnIcon = .Site.Data.homepage.about.button.icon -}}
+ {{- $btnText = i18n "about_button" -}}
+{{ end }}
+
+
+
+<section id="contact" class="section section--contact pt-0">
+    <div class="container">
+        <div class="contact">
+            <h2>{{ $title }}</h2>
+
+            <div class="col-12 contact__info">
+                <div class="row pt-4">
+                    <div class="col-12">
+                        {{ if $btnText }}
+                            <a href="{{ $btnURL | absURL }}" target="_blank" class="btn btn-primary">
+                                <i class="{{ $btnIcon }}"></i>
+                                {{ $btnText }}
+                            </a>
+                        {{ end }}
+                    </div>
+                </div>
+                <div class="row pt-4">
+                    <div class="col-12">
+                        {{ if $addressText }}
+                            {{ $addressTitle }}: <span>{{ $addressText | safeHTML }}</span>
+                        {{ end }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

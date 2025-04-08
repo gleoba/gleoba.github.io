@@ -50,24 +50,19 @@ draft = false
 >}}
 
 {{< education-list
-    title="Formal Education" >}}
+    title="Formal Education" >}}`
 
 {{< testimonial-section
     title="Testimonials" >}}
 
 {{< contact-section
-    title="Reach out" 
-    contact_form_name="Your name?"
-    contact_form_email="Your e-mail"
-    contact_form_message="Your text"
-    contact_button="Send message"
-    contact_phone_title="My phone"
-    contact_phone_number="<a href='tel:+555666777'>555 666 777</a>"
-    contact_email_title="My mail"
-    contact_email_email="demo@demosite.com"
-    contact_address_title="My location"
+    title="Reach out"
+    
+    button_text="LinkedIn"
+    button_url="https://www.linkedin.com/in/gleb-gotgelf/"
+    button_icon="icon-linkedin"
+
+    contact_address_title="Location"
     contact_address_address="Israel, Netanya"
-    form_action="https://formspree.io/f/mail@example.com"
-    form_method="POST"
 >}}
 

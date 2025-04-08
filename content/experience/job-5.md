@@ -3,9 +3,9 @@ date: 2024-03-01T00:00:00+02:00
 draft: false
 title: "Consulting Architect"
 jobTitle: "Software and Solution Architect"
-company: "Self-Employed"
+company: "Freelancer"
 location: "Israel"
-duration: "March 2024 – "
+duration: "March 2024 –"
 companyLogo: "images/experience/se-logo-small.png"
 
 ---
