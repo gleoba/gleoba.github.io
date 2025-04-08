@@ -3,6 +3,8 @@ date: '2023-09-07T00:00:00+00:00'
 title: 'Vodafone'
 draft: false # set to "true" if you want to hide the content
 
+link: "#portfolio" 
+
 params:
     logo:
       src: "images/clients/color/vodafone-logo.png"

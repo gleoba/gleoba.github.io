@@ -3,6 +3,8 @@ date: '2023-09-08T00:00:00+00:00'
 title: 'Comcast'
 draft: false # set to "true" if you want to hide the content
 
+link: "#portfolio" 
+
 params:
     logo:
       src: "images/clients/color/comcast-logo.png"

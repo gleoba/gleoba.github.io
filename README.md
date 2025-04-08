@@ -19,3 +19,14 @@ git commit -a -m 'Update setup instructions in README.md [issue 1]'
 ```
 
 diff -q -r gleoba-pile gleoba.github.io -x public -x resources
+
+
+## install and run
+npm install
+npm fund
+
+hugo server --disableFastRender
+or
+hugo server
+
+http://localhost:1313/
