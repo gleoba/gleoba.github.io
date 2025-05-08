@@ -3,7 +3,7 @@ date: '2020-08-01T00:00:00+00:00'
 title: 'Cellcom'
 draft: false # set to "true" if you want to hide the content
 
-link: "#portfolio" 
+link: "../client-work/cellcom/index.html" 
 
 params:
     logo:

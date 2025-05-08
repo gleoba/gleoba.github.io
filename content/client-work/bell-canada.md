@@ -3,7 +3,7 @@ date: '2023-09-05T00:00:00+00:00'
 title: 'Bell Canada'
 draft: false # set to "true" if you want to hide the content
 
-link: "#portfolio" 
+link: "../client-work/bell-canada/index.html" 
 
 params:
     logo:
