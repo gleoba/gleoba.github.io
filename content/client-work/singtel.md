@@ -3,7 +3,7 @@ date: '2023-08-20T00:00:00+00:00'
 title: 'Singtel'
 draft: false # set to "true" if you want to hide the content
 
-link: "#portfolio" 
+link: "../client-work/singtel/index.html"
 
 params:
     logo:

@@ -3,7 +3,7 @@ date: '2023-08-01T00:00:00+00:00'
 title: 'Telkom'
 draft: false # set to "true" if you want to hide the content
 
-link: "#portfolio" 
+link: "../client-work/telkom/index.html"
 
 params:
     logo:
