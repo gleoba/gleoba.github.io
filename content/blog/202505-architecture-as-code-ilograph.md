@@ -63,8 +63,7 @@ Ilograph combines the rigor of "as code" methodology with the intuitive power of
 **Instead of producing static diagrams, Ilograph creates navigable, multi-perspective models of your system.**
 
 <video muted="" autoplay="" loop="" playsinline="" alt="An Ilograph diagram changing perspectives" loading="lazy" style="width: 100%;" fetchpriority="high" poster="/blog/img/breakup/breakup.jpg">
-    <source src="/images/blog/ilograph_all.mp4" media="(min-width: 501px)">
-    <source src="/images/blog/ilograph_all.mp4" media="(max-width: 500px)">
+    <source src="https://github.com/gleoba/gleoba.github.io/raw/refs/heads/master/assets/images/blog/ilograph_all.mp4">
 </video>
 
 *source ilograph.com*
