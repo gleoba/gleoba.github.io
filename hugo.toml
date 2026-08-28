@@ -1,6 +1,6 @@
 baseURL = "https://gleoba.github.io/"
 title = "Gleoba's Pile"
-languageCode = "en"
+locale = "en"
 
 [markup.goldmark.renderer]
 unsafe = true
@@ -117,9 +117,9 @@ mobileHeader = false
 [languages]
 [languages.en]
 disabled = false
-languageCode = 'en'
-languageDirection = 'ltr'
-languageName = 'English'
+locale = 'en'
+direction = 'ltr'
+label = 'English'
 title = ''
 weight = 0
 

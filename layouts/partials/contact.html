@@ -36,12 +36,12 @@
 {{- $btnText := "" -}}
 
 {{- if $isShortcode }}
- {{- $btnURL = .Get "button_url" | default .Site.Data.homepage.about.button.URL -}}
- {{- $btnIcon = .Get "button_icon" | default .Site.Data.homepage.about.button.icon -}}
+ {{- $btnURL = .Get "button_url" | default hugo.Data.homepage.about.button.URL -}}
+ {{- $btnIcon = .Get "button_icon" | default hugo.Data.homepage.about.button.icon -}}
  {{- $btnText = .Get "button_text" | default false -}}
 {{ else }}
- {{- $btnURL = .Site.Data.homepage.about.button.URL -}}
- {{- $btnIcon = .Site.Data.homepage.about.button.icon -}}
+ {{- $btnURL = hugo.Data.homepage.about.button.URL -}}
+ {{- $btnIcon = hugo.Data.homepage.about.button.icon -}}
  {{- $btnText = i18n "about_button" -}}
 {{ end }}
 
