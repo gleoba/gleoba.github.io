@@ -58,6 +58,9 @@ or
 ### deploy and run action in GitHub
 * it's possible to run it manualy via [workflows-at-github.com]: https://github.com/gleoba/gleoba.github.io/actions/workflows/hugo.yaml
 
+>  0. if needed, login in cli and follow the instructions for ssh connection.
+gh auth login -h github.com
+
 >  1. check first the latest commit 
 gh browse --commit --no-browser
 gh search commits --committer=$USER --sort=committer-date --limit=3
