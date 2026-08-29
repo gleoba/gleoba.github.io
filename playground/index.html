@@ -1,33 +1,176 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<style>
-a:link {
-    color: green;
-    background-color: transparent;
-    text-decoration: none;
-}
-a:visited {
-    color: pink;
-    background-color: transparent;
-    text-decoration: none;
-}
-a:hover {
-    color: red;
-    background-color: transparent;
-    text-decoration: underline;
-}
-a:active {
-    color: yellow;
-    background-color: transparent;
-    text-decoration: underline;
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Public Projects</title>
+  <style>
+    /* Reset & Base Styling matching the Currency App design system */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .app-container {
+      max-width: 440px;
+      margin: 0 auto;
+      width: 100%;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 20px 16px;
+    }
+    header {
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #334155;
+    }
+    h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #34d399;
+      letter-spacing: -0.02em;
+    }
+    .subtitle {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+    .projects-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+    }
+    .project-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #1e293b;
+      border: 1px solid #334155;
+      padding: 16px;
+      border-radius: 14px;
+      text-decoration: none;
+      color: #f8fafc;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.2s, border-color 0.2s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .project-card:hover, .project-card:focus {
+      background-color: #26334d;
+      border-color: #10b981;
+    }
+    .project-card:active {
+      transform: scale(0.98);
+      background-color: #334155;
+    }
+    .project-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .project-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background-color: #0f172a;
+      border: 1px solid #334155;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .project-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #e2e8f0;
+      margin-bottom: 2px;
+    }
+    .project-desc {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+    .arrow-icon {
+      color: #34d399;
+      font-size: 18px;
+      font-weight: bold;
+      transition: transform 0.2s;
+    }
+    .project-card:hover .arrow-icon {
+      transform: translateX(3px);
+    }
+    footer {
+      text-align: center;
+      padding: 20px 0 10px;
+      font-size: 11px;
+      color: #64748b;
+    }
+  </style>
 </head>
 <body>
-<p>Public Projects</p>
-<a href="running_splits.html" target="_blank">Running Splits</a>
-<br></br>
-<a href="jsonata_test.html" target="_blank">jsonata Test</a>
+
+  <div class="app-container">
+
+    <!-- HEADER -->
+    <header>
+      <h1>Public Projects</h1>
+      <p class="subtitle">Select a web app to launch</p>
+    </header>
+
+    <!-- PROJECTS LIST -->
+    <main class="projects-list">
+
+      <a href="currency.html" target="_blank" class="project-card">
+        <div class="project-info">
+          <div class="project-icon">💱</div>
+          <div>
+            <div class="project-title">Currency Converter</div>
+            <div class="project-desc">Offline rates & tip calculation assistant</div>
+          </div>
+        </div>
+        <span class="arrow-icon">›</span>
+      </a>
+
+      <a href="running_splits.html" target="_blank" class="project-card">
+        <div class="project-info">
+          <div class="project-icon">🏃</div>
+          <div>
+            <div class="project-title">Running Splits</div>
+            <div class="project-desc">Pace & distance split calculator</div>
+          </div>
+        </div>
+        <span class="arrow-icon">›</span>
+      </a>
+
+      <a href="jsonata_test.html" target="_blank" class="project-card">
+        <div class="project-info">
+          <div class="project-icon">⚡</div>
+          <div>
+            <div class="project-title">jsonata Test</div>
+            <div class="project-desc">JSON transformation & query playground</div>
+          </div>
+        </div>
+        <span class="arrow-icon">›</span>
+      </a>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+      Made with love by @Gleoba • Standalone Projects
+    </footer>
+
+  </div>
+
 </body>
 </html>

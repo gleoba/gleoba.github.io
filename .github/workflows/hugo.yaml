@@ -1,3 +1,4 @@
+# GitHub Pages workflow
 name: Deploy gleoba.github.io site to GitHub Pages
 
 on:
@@ -85,7 +86,7 @@ jobs:
         run: |
           mkdir -p ./public/playground
           cp -r ./playground/*.html ./public/playground/
-      
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
         with:

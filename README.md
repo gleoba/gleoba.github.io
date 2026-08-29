@@ -1,6 +1,7 @@
 # gleoba.github.io
 
 * to view, go to [https://gleoba.github.io]: https://gleoba.github.io
+* for playground index go to [https://gleoba.github.io/playground]: https://gleoba.github.io/playground
 
 ## SETUP DEV
 
