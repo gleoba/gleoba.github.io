@@ -2,8 +2,33 @@ baseURL = "https://gleoba.github.io/"
 title = "Gleoba's Pile"
 locale = "en"
 
-[markup.goldmark.renderer]
-unsafe = true
+[pagination]
+pagerSize = 3
+
+
+# Exclude footer section from generating list pages (index.html and index.xml)
+[outputs]
+  page = ["HTML"]
+  home = ["HTML", "RSS", "JSON"]
+  section = ["HTML", "RSS"]
+  taxonomy = ["HTML", "RSS"]
+  term = ["HTML", "RSS"]
+# disabled due to WARN  Unknown kind "footer" in outputs configuration.
+# footer = ["RSS"]
+
+[taxonomies]
+  tag = "tags"
+  category = "categories"
+  author = "authors"
+  series = "series"
+  topic = "topics"
+
+# Explicitly prevent the footer section from generating any output
+[outputFormats.footerSection]
+  # Empty configuration to prevent any output
+
+# Specifically disable generation of these kinds for the footer content
+disableKinds = ["footerSection"]
 
 [module]
 [[module.imports]]
@@ -53,6 +78,32 @@ target = "assets/css/bootstrap-print.css"
 title = "Gleoba's Pile"
 description = "Gleoba's Pile personal site"
 images = ['/img/og-img.png']
+themeColor = '#478079'
+
+# Color scheme: default | ocean | forest | rose | slate | midnight | warm
+colorScheme = 'slate'
+
+# Enable the live color scheme switcher (for the demo site)
+[params.colorSchemeSwitcher]
+enable = false
+
+# Color scheme selector visibility — set to true to hide in that location
+[params.colorSchemeSwitcher.selector.disable]
+footer = false
+header = false
+
+[params.seo]
+siteName = "Gleoba's Pile"
+siteDescription = "Gleoba's Pile personal site"
+siteImage = '/img/og-img.png'
+
+[params.social]
+twitter = 'gleoba'
+
+[params.seo.person]
+name = 'Gleb Gotgelf'
+url = 'https://www.linkedin.com/in/gleb-gotgelf/'
+sameAs = ['https://github.com/gleoba']
 sections = [
   "showcase",
   "about",
@@ -67,6 +118,19 @@ sections = [
 # logo = '/img/hugo.svg'
 
 homepageExperienceCount = 2
+
+[params.favicons]
+# Optional: provide a different source image for auto-generation
+source = "icons/favicon.png"
+
+# Optional: override any generated file with a static one
+# favicon = "/favicon.ico"
+# icon16 = "/icons/icon-16.png"
+# icon32 = "/icons/icon-32.png"
+# appleTouch = "/icons/apple-touch-icon.png"
+# icon192 = "/icons/icon-192.png"
+# icon512 = "/icons/icon-512.png"
+# manifest = "/site.webmanifest"
 
 [params.analytics]
 ## Analytics parameters.
@@ -84,7 +148,6 @@ vercelAnalytics = false
 code = "G-1JFJR82J0V"
 enabled = true
 
-
 ## analytics from the TEMPLATE - not working
 [params.analytics.googleTagManager]
 code = "GTM-NH9C67B5"
@@ -96,10 +159,11 @@ id = "GTM-NH9C67B5"
 code = "GTM-NH9C67B5"
 enabled = true
 
-
-
 [build]
+writeStats = true
+
 [build.buildStats]
+enabledFor = ["scss"]
 disableClasses = false
 disableIDs = false
 disableTags = false
@@ -109,6 +173,8 @@ enable = true
   [caches.images]
     dir = ':cacheDir/images'
 
+
+# Language selector visibility — set to true to hide in that location
 [params.languages.selector.disable]
 footer = false
 header = false
@@ -120,7 +186,7 @@ disabled = false
 locale = 'en'
 direction = 'ltr'
 label = 'English'
-title = ''
+title = "Gleoba's Pile"
 weight = 0
 
 [languages.en.menus]
@@ -151,6 +217,11 @@ name = "Contact"
 URL = "#contact"
 weight = 6
 
+[[languages.en.menus.header]]
+pre = "search"
+name = "Search"
+URL = "/search"
+weight = 7
 [[languages.en.menus.footer]]
 name = "Home"
 URL = "/"
@@ -214,21 +285,70 @@ URL = "scss/adritian.scss"
 #  [params.colorTheme.selector.disable]
 #  footer = true
 
-
+# Color theme selector visibility — set to true to hide in that location
 [params.colorTheme.selector.disable]
 footer = false
 header = false
 mobileHeader = false
 ## by default we allow override AND automatic selection
 
+# View Transitions API - enabled by default
+# Set to false to disable the native View Transitions API
+# viewTransitions = false
+
+[params.sharing]
+bluesky = true
+mastodon = true
+
 [params.blog]
-layout = "sidebar"     # options: default, sidebar
+layout = "sidebar"     # options: default (no sidebar), sidebar, sidebar-right
 sidebarWidth = "25"    # percentage width of the sidebar
+narrowContent = true   # if true, limits content width to 720px for better readability
 showCategories = false
 showRecentPosts = true
 recentPostCount = 5
 listStyle = "simple"  # options: simple, summary
+listLayout = "default" # options: default, cards
+featured_sort_by_weight = true
+featured_sort_by_date = false
 
 
 [params.experience]
 showJobCard = true # Set to false to hide the job card
+
+# Navbar overflow handling - options: "dropdown" | "footer" | "none"
+[params.navbarOverflow]
+mode = "dropdown" # "dropdown" moves items to More dropdown, "footer" moves to footer, "none" disables
+
+
+# Performance optimizations
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+  [markup.highlight]
+    lineNos = false
+    noClasses = false
+    style = "github"
+
+[imaging]
+  resampleFilter = "Lanczos"
+  quality = 85
+  anchor = "Smart"
+
+[minify]
+  disableCSS = false
+  disableHTML = false
+  disableJS = false
+  disableJSON = false
+  disableSVG = false
+  disableXML = false
+  minifyOutput = true
+  [minify.tdewolff]
+    [minify.tdewolff.html]
+      keepDefaultAttrVals = true
+      keepWhitespace = false
+    [minify.tdewolff.css]
+      precision = 0
+    [minify.tdewolff.js]
+      precision = 0
