@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Currency & Tip Converter</title>
+  <style>
+    /* Reset & Base Styling (Zero external dependency) */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .app-container {
+      max-width: 440px;
+      margin: 0 auto;
+      width: 100%;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #334155;
+    }
+    h1 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #34d399;
+    }
+    .subtitle {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+    .btn {
+      background-color: #1e293b;
+      color: #e2e8f0;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn:active {
+      background-color: #334155;
+    }
+    .btn-primary {
+      background-color: #10b981;
+      color: #022c22;
+      border: none;
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      border-radius: 12px;
+      text-align: center;
+      cursor: pointer;
+    }
+    .btn-primary:active {
+      background-color: #34d399;
+    }
+    .btn-reset {
+      background-color: transparent;
+      color: #fb7185;
+      border: 1px solid #f43f5e;
+      width: 100%;
+      padding: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background-color 0.2s, color 0.2s;
+    }
+    .btn-reset:active {
+      background-color: rgba(244, 63, 94, 0.2);
+    }
+    .btn-add {
+      background-color: #059669;
+      color: #ffffff;
+      border: none;
+      font-weight: 700;
+      border-radius: 8px;
+      padding: 8px;
+      cursor: pointer;
+    }
+    .card {
+      background-color: #1e293b;
+      border: 1px solid #334155;
+      padding: 16px;
+      border-radius: 14px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    label {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .currency-symbol-display {
+      position: absolute;
+      left: 12px;
+      color: #94a3b8;
+      font-weight: 700;
+      font-size: 18px;
+    }
+    input[type="text"], input[type="number"], select {
+      width: 100%;
+      background-color: #0f172a;
+      color: #f8fafc;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 14px;
+      outline: none;
+    }
+    input[type="text"]:focus, input[type="number"]:focus, select:focus {
+      border-color: #10b981;
+    }
+    #amount-input {
+      font-size: 24px;
+      font-weight: 700;
+      padding-left: 42px;
+      padding-top: 12px;
+      padding-bottom: 12px;
+    }
+    .currency-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #0f172a;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      margin-bottom: 8px;
+    }
+    .currency-item:last-child {
+      margin-bottom: 0;
+    }
+    .currency-code {
+      font-size: 14px;
+      font-weight: 700;
+      color: #e2e8f0;
+    }
+    .currency-rate-sub {
+      font-size: 10px;
+      color: #64748b;
+      margin-left: 6px;
+    }
+    .converted-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: #34d399;
+    }
+    .tip-grid {
+      display: grid;
+      grid-template-cols: 1fr 1fr;
+      gap: 8px;
+    }
+    .tip-card {
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+    }
+    .tip-badge {
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(15, 23, 42, 0.4);
+    }
+    .tip-7 { background-color: rgba(6, 78, 59, 0.5); border-color: rgba(4, 120, 87, 0.6); color: #6ee7b7; }
+    .tip-10 { background-color: rgba(12, 74, 110, 0.5); border-color: rgba(3, 105, 161, 0.6); color: #7dd3fc; }
+    .tip-12 { background-color: rgba(49, 46, 129, 0.5); border-color: rgba(67, 56, 202, 0.6); color: #a5b4fc; }
+    .tip-15 { background-color: rgba(88, 28, 135, 0.5); border-color: rgba(126, 34, 206, 0.6); color: #d8b4fe; }
+
+    .hidden {
+      display: none !important;
+    }
+    .grid-5 {
+      display: grid;
+      grid-template-columns: 2fr 2fr 1fr;
+      gap: 8px;
+    }
+    .remove-btn {
+      color: #fb7185;
+      background: none;
+      border: none;
+      font-size: 20px;
+      font-weight: 700;
+      padding: 0 8px;
+      cursor: pointer;
+    }
+    .error-msg {
+      color: #fb7185;
+      font-size: 11px;
+      margin-top: 6px;
+      display: none;
+    }
+    footer {
+      text-align: center;
+      padding: 16px 0;
+      font-size: 11px;
+      color: #64748b;
+    }
+    .sticky-bottom {
+      position: sticky;
+      bottom: 16px;
+      padding-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- APP CONTAINER -->
+  <div class="app-container">
+
+    <!-- HEADER -->
+    <header>
+      <div>
+        <h1>Валютная шпаргалка</h1>
+        <p class="subtitle">Currency & Tip Calculator</p>
+      </div>
+      <button id="nav-btn" class="btn">
+        <span id="nav-btn-icon">⚙️</span>
+        <span id="nav-btn-text">Configure</span>
+      </button>
+    </header>
+
+    <!-- MAIN CONVERTER SECTION -->
+    <main id="main-section">
+      
+      <!-- INPUT CARD -->
+      <div class="card">
+        <label for="amount-input">
+          Local Amount (<span id="local-currency-badge" style="color: #34d399;">CZK</span>)
+        </label>
+        <div class="input-wrapper">
+          <span id="local-symbol-display" class="currency-symbol-display">Kč</span>
+          <input 
+            type="text" 
+            id="amount-input" 
+            inputmode="decimal" 
+            placeholder="0.00" 
+          />
+        </div>
+      </div>
+
+      <!-- 1. CONVERTED CURRENCIES LIST -->
+      <div class="card">
+        <div class="card-title">
+          <span>💱</span> Converted Amounts
+        </div>
+        <div id="currency-list">
+          <!-- Dynamically populated currencies -->
+        </div>
+      </div>
+
+      <!-- 2. COMPACT TIP CALCULATOR -->
+      <div class="card">
+        <div class="card-title">
+          <span>💡</span> Tip Assistant
+        </div>
+        <div class="tip-grid" id="tip-cards">
+          <!-- Dynamically populated tip items -->
+        </div>
+      </div>
+
+    </main>
+
+    <!-- CONFIGURATION SECTION -->
+    <main id="config-section" class="hidden">
+      
+      <!-- CONFIG HEADER -->
+      <div class="card">
+        <div style="margin-bottom: 12px;">
+          <h2 style="font-size: 16px; color: #34d399; margin-bottom: 4px;">Configuration</h2>
+          <p class="subtitle">Select your base local currency and manage exchange rates.</p>
+        </div>
+
+        <div>
+          <label for="local-currency-select">Local Currency (Base Input)</label>
+          <select id="local-currency-select" style="color: #34d399; font-weight: 700;">
+            <!-- Options -->
+          </select>
+        </div>
+      </div>
+
+      <!-- ADD NEW CURRENCY FORM -->
+      <div class="card">
+        <label>Add Currency</label>
+        <div class="grid-5">
+          <input type="text" id="new-code" placeholder="Code (e.g. USD)" maxlength="5" style="text-transform: uppercase;" />
+          <input type="number" id="new-rate" step="any" placeholder="Rate to Local" />
+          <button id="add-currency-btn" class="btn-add">Add</button>
+        </div>
+        <div id="add-error-msg" class="error-msg"></div>
+      </div>
+
+      <!-- EDIT CURRENCIES LIST -->
+      <div class="card">
+        <label>Exchange Rates (Relative to 1 Local)</label>
+        <div id="config-rates-list" style="margin-top: 8px;">
+          <!-- Dynamically generated rate inputs -->
+        </div>
+      </div>
+
+      <!-- SAVE & RESET BUTTONS -->
+      <div class="sticky-bottom">
+        <button id="save-config-btn" class="btn-primary">Save & Return</button>
+        <button id="reset-config-btn" class="btn-reset">Reset to Defaults</button>
+      </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+      Made with love by @Gleoba • Offline Ready • Base: <span id="footer-local-code">CZK</span>
+    </footer>
+
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // Initial Default Data
+    var DEFAULT_RATES = [
+      { code: 'CZK', rate: 20.7952, symbol: 'Kč' },
+      { code: 'ILS', rate: 2.9805, symbol: '₪' },
+      { code: 'EUR', rate: 0.861, symbol: '€' },
+      { code: 'USD', rate: 1.00, symbol: '$' }
+    ];
+
+    var TIP_PERCENTAGES = [
+      { pct: 7, cssClass: 'tip-7' },
+      { pct: 10, cssClass: 'tip-10' },
+      { pct: 12, cssClass: 'tip-12' },
+      { pct: 15, cssClass: 'tip-15' }
+    ];
+
+    // Saved State Variables
+    var currencies = [];
+    var localCurrencyCode = 'CZK';
+    var isConfigMode = false;
+
+    // Draft State Variables (for isolation during Configuration editing)
+    var draftCurrencies = [];
+    var draftLocalCurrencyCode = 'CZK';
+    var resetConfirmTimeout = null;
+
+    // UI Element References
+    var mainSection = document.getElementById('main-section');
+    var configSection = document.getElementById('config-section');
+    var navBtn = document.getElementById('nav-btn');
+    var navBtnText = document.getElementById('nav-btn-text');
+    var navBtnIcon = document.getElementById('nav-btn-icon');
+    var amountInput = document.getElementById('amount-input');
+    var tipCards = document.getElementById('tip-cards');
+    var currencyList = document.getElementById('currency-list');
+    var configRatesList = document.getElementById('config-rates-list');
+    var localCurrencySelect = document.getElementById('local-currency-select');
+    var saveConfigBtn = document.getElementById('save-config-btn');
+    var resetConfigBtn = document.getElementById('reset-config-btn');
+    var addCurrencyBtn = document.getElementById('add-currency-btn');
+    var newCodeInput = document.getElementById('new-code');
+    var newRateInput = document.getElementById('new-rate');
+    var addErrorMsg = document.getElementById('add-error-msg');
+    var localCurrencyBadge = document.getElementById('local-currency-badge');
+    var localSymbolDisplay = document.getElementById('local-symbol-display');
+    var footerLocalCode = document.getElementById('footer-local-code');
+
+    // Safe LocalStorage wrappers to prevent WebKit / Telegram sandbox exceptions
+    function safeGetItem(key) {
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          return window.localStorage.getItem(key);
+        }
+      } catch (e) {
+        return null;
+      }
+      return null;
+    }
+
+    function safeSetItem(key, value) {
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          window.localStorage.setItem(key, value);
+        }
+      } catch (e) {
+        // Storage disabled or blocked in sandbox
+      }
+    }
+
+    function safeRemoveItem(key) {
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          window.localStorage.removeItem(key);
+        }
+      } catch (e) {
+        // Storage disabled or blocked in sandbox
+      }
+    }
+
+    // Load Data from Local Storage safely
+    function loadStorageData() {
+      var storedCurrencies = safeGetItem('travelmate_currencies_v6');
+      var storedLocal = safeGetItem('travelmate_local_currency_v6');
+
+      if (storedCurrencies) {
+        try {
+          var parsed = JSON.parse(storedCurrencies);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            currencies = parsed;
+          } else {
+            currencies = JSON.parse(JSON.stringify(DEFAULT_RATES));
+          }
+        } catch(e) {
+          currencies = JSON.parse(JSON.stringify(DEFAULT_RATES));
+        }
+      } else {
+        currencies = JSON.parse(JSON.stringify(DEFAULT_RATES));
+      }
+
+      if (storedLocal && currencies.some(function(c) { return c.code === storedLocal; })) {
+        localCurrencyCode = storedLocal;
+      } else {
+        localCurrencyCode = 'CZK';
+      }
+    }
+
+    // Save Data to Local Storage
+    function saveStorageData() {
+      safeSetItem('travelmate_currencies_v6', JSON.stringify(currencies));
+      safeSetItem('travelmate_local_currency_v6', localCurrencyCode);
+    }
+
+    // Navigation and Configuration Lifecycle
+    navBtn.addEventListener('click', function() {
+      if (isConfigMode) {
+        cancelConfiguration();
+      } else {
+        openConfiguration();
+      }
+    });
+
+    saveConfigBtn.addEventListener('click', function() {
+      saveConfiguration();
+    });
+
+    // Safe Reset with double-tap protection
+    resetConfigBtn.addEventListener('click', function() {
+      var isConfirming = resetConfigBtn.getAttribute('data-confirming');
+      if (!isConfirming) {
+        resetConfigBtn.setAttribute('data-confirming', 'true');
+        resetConfigBtn.textContent = "⚠️ Tap again to confirm Reset";
+        resetConfigBtn.style.backgroundColor = "rgba(244, 63, 94, 0.2)";
+        
+        resetConfirmTimeout = setTimeout(function() {
+          clearResetBtnState();
+        }, 3000);
+      } else {
+        clearResetBtnState();
+        performReset();
+      }
+    });
+
+    function clearResetBtnState() {
+      if (resetConfirmTimeout) clearTimeout(resetConfirmTimeout);
+      resetConfigBtn.removeAttribute('data-confirming');
+      resetConfigBtn.textContent = "Reset to Defaults";
+      resetConfigBtn.style.backgroundColor = "transparent";
+    }
+
+    function performReset() {
+      safeRemoveItem('travelmate_currencies_v6');
+      safeRemoveItem('travelmate_local_currency_v6');
+
+      currencies = JSON.parse(JSON.stringify(DEFAULT_RATES));
+      localCurrencyCode = 'CZK';
+      
+      draftCurrencies = JSON.parse(JSON.stringify(DEFAULT_RATES));
+      draftLocalCurrencyCode = 'CZK';
+
+      renderConfigSection();
+    }
+
+    function openConfiguration() {
+      isConfigMode = true;
+      clearResetBtnState();
+      showError('');
+
+      draftCurrencies = JSON.parse(JSON.stringify(currencies));
+      draftLocalCurrencyCode = localCurrencyCode;
+      
+      renderConfigSection();
+      mainSection.classList.add('hidden');
+      configSection.classList.remove('hidden');
+      if (navBtnText) navBtnText.textContent = 'Cancel';
+      if (navBtnIcon) navBtnIcon.textContent = '✕';
+    }
+
+    function cancelConfiguration() {
+      isConfigMode = false;
+      clearResetBtnState();
+      draftCurrencies = [];
+      
+      configSection.classList.add('hidden');
+      mainSection.classList.remove('hidden');
+      if (navBtnText) navBtnText.textContent = 'Configure';
+      if (navBtnIcon) navBtnIcon.textContent = '⚙️';
+      renderApp();
+    }
+
+    function saveConfiguration() {
+      readDraftInputs();
+      currencies = JSON.parse(JSON.stringify(draftCurrencies));
+      localCurrencyCode = draftLocalCurrencyCode;
+      saveStorageData();
+
+      isConfigMode = false;
+      clearResetBtnState();
+      configSection.classList.add('hidden');
+      mainSection.classList.remove('hidden');
+      if (navBtnText) navBtnText.textContent = 'Configure';
+      if (navBtnIcon) navBtnIcon.textContent = '⚙️';
+      renderApp();
+    }
+
+    // Format numbers with commas
+    function formatNumber(num) {
+      if (isNaN(num) || num === null || num === undefined) return '0';
+      try {
+        return num.toLocaleString('en-US', {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 2
+        });
+      } catch (e) {
+        return num.toFixed(2);
+      }
+    }
+
+    function parseInputValue(str) {
+      if (!str) return 0;
+      var cleanStr = str.replace(/,/g, '');
+      var val = parseFloat(cleanStr);
+      return isNaN(val) ? 0 : val;
+    }
+
+    // Real-time Input Formatting and Calculation
+    function handleAmountInput(e) {
+      var rawVal = e.target.value;
+      rawVal = rawVal.replace(/[^0-9.]/g, '');
+      
+      var parts = rawVal.split('.');
+      if (parts.length > 2) {
+        rawVal = parts[0] + '.' + parts.slice(1).join('');
+      }
+
+      if (parts[0]) {
+        parts[0] = parseInt(parts[0], 10).toLocaleString('en-US');
+      }
+
+      e.target.value = parts.join('.');
+      updateCalculations();
+    }
+
+    amountInput.addEventListener('input', handleAmountInput);
+    amountInput.addEventListener('keyup', handleAmountInput);
+    amountInput.addEventListener('change', handleAmountInput);
+
+    function getLocalBaseRate(rateList, localCode) {
+      var currentLocal = rateList.find(function(c) { return c.code === localCode; });
+      return currentLocal ? currentLocal.rate : 1;
+    }
+
+    // Update Main Conversions & Tips
+    function updateCalculations() {
+      var rawAmount = parseInputValue(amountInput.value);
+      var localObj = currencies.find(function(c) { return c.code === localCurrencyCode; }) || { code: 'CZK', symbol: 'Kč', rate: 1 };
+      
+      if (localCurrencyBadge) localCurrencyBadge.textContent = localObj.code;
+      if (localSymbolDisplay) localSymbolDisplay.textContent = localObj.symbol || localObj.code;
+      if (footerLocalCode) footerLocalCode.textContent = localObj.code;
+
+      var localBaseRate = getLocalBaseRate(currencies, localCurrencyCode);
+
+      // 1. RENDER CONVERTED CURRENCIES
+      currencyList.innerHTML = '';
+      var targetCurrencies = currencies.filter(function(c) { return c.code !== localCurrencyCode; });
+
+      if (targetCurrencies.length === 0) {
+        currencyList.innerHTML = '<p style="font-size:12px; color:#64748b; font-style:italic;">No target currencies configured. Tap Configure to add.</p>';
+      } else {
+        targetCurrencies.forEach(function(c) {
+          var convertedVal = rawAmount * (c.rate / localBaseRate);
+          var rateToLocal = (c.rate / localBaseRate).toFixed(4);
+          var symbol = c.symbol || '';
+
+          var item = document.createElement('div');
+          item.className = 'currency-item';
+          item.innerHTML = `
+            <div>
+              <span class="currency-code">${c.code}</span>
+              <span class="currency-rate-sub">1 ${localCurrencyCode} = ${rateToLocal}</span>
+            </div>
+            <div class="converted-value">
+              ${symbol} ${formatNumber(convertedVal)}
+            </div>
+          `;
+          currencyList.appendChild(item);
+        });
+      }
+
+      // 2. RENDER TIP ASSISTANT
+      tipCards.innerHTML = '';
+      TIP_PERCENTAGES.forEach(function(itemData) {
+        var pct = itemData.pct;
+        var tipClass = itemData.cssClass;
+        var tipVal = rawAmount * (pct / 100);
+        var totalVal = rawAmount + tipVal;
+
+        var card = document.createElement('div');
+        card.className = 'tip-card ' + tipClass;
+        card.innerHTML = `
+          <span class="tip-badge">${pct}%</span>
+          <span>${formatNumber(rawAmount)}+${formatNumber(tipVal)} = <strong style="color:#fff;">${formatNumber(totalVal)}</strong></span>
+        `;
+        tipCards.appendChild(card);
+      });
+    }
+
+    function renderApp() {
+      updateCalculations();
+    }
+
+    function showError(msg) {
+      if (!msg) {
+        addErrorMsg.style.display = 'none';
+        addErrorMsg.textContent = '';
+      } else {
+        addErrorMsg.style.display = 'block';
+        addErrorMsg.textContent = msg;
+      }
+    }
+
+    function readDraftInputs() {
+      var localObj = draftCurrencies.find(function(c) { return c.code === draftLocalCurrencyCode; });
+      var localBaseRate = localObj ? localObj.rate : 1;
+
+      var inputs = document.querySelectorAll('.config-rate-input');
+      inputs.forEach(function(input) {
+        var idx = parseInt(input.getAttribute('data-index'), 10);
+        var relativeRateVal = parseFloat(input.value);
+        if (!isNaN(relativeRateVal) && relativeRateVal > 0 && draftCurrencies[idx]) {
+          draftCurrencies[idx].rate = relativeRateVal * localBaseRate;
+        }
+      });
+    }
+
+    function renderConfigSection() {
+      localCurrencySelect.innerHTML = '';
+      draftCurrencies.forEach(function(c) {
+        var opt = document.createElement('option');
+        opt.value = c.code;
+        opt.textContent = c.code + (c.symbol ? ' (' + c.symbol + ')' : '');
+        if (c.code === draftLocalCurrencyCode) opt.selected = true;
+        localCurrencySelect.appendChild(opt);
+      });
+
+      configRatesList.innerHTML = '';
+      var localBaseRate = getLocalBaseRate(draftCurrencies, draftLocalCurrencyCode);
+
+      draftCurrencies.forEach(function(c, idx) {
+        var isLocal = (c.code === draftLocalCurrencyCode);
+        var relativeRate = (c.rate / localBaseRate);
+
+        var card = document.createElement('div');
+        card.className = 'currency-item';
+
+        if (isLocal) {
+          card.innerHTML = `
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:10px; background:rgba(16,185,129,0.2); color:#34d399; padding:2px 6px; border-radius:4px; font-weight:700;">LOCAL</span>
+              <span style="font-weight:700; font-size:14px;">${c.code}</span>
+            </div>
+            <div style="font-size:12px; color:#94a3b8;">Fixed Base (1.00)</div>
+          `;
+        } else {
+          card.innerHTML = `
+            <div style="width:50px;">
+              <span style="font-weight:700; font-size:14px;">${c.code}</span>
+            </div>
+            <div style="flex:1; display:flex; align-items:center; gap:6px;">
+              <span style="font-size:11px; color:#94a3b8;">1 ${draftLocalCurrencyCode} =</span>
+              <input 
+                type="number" 
+                step="any"
+                data-index="${idx}" 
+                value="${relativeRate.toFixed(4)}" 
+                class="config-rate-input"
+              />
+            </div>
+            <button data-index="${idx}" class="remove-currency-btn remove-btn" title="Remove">×</button>
+          `;
+        }
+        configRatesList.appendChild(card);
+      });
+
+      document.querySelectorAll('.remove-currency-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          readDraftInputs();
+          var index = parseInt(e.target.getAttribute('data-index'), 10);
+          draftCurrencies.splice(index, 1);
+          renderConfigSection();
+        });
+      });
+    }
+
+    localCurrencySelect.addEventListener('change', function(e) {
+      readDraftInputs();
+      draftLocalCurrencyCode = e.target.value;
+      renderConfigSection();
+    });
+
+    addCurrencyBtn.addEventListener('click', function() {
+      showError('');
+      readDraftInputs();
+      var code = newCodeInput.value.trim().toUpperCase();
+      var relativeRate = parseFloat(newRateInput.value);
+
+      if (!code) {
+        showError('Please enter a currency code.');
+        return;
+      }
+      if (isNaN(relativeRate) || relativeRate <= 0) {
+        showError('Please enter a valid positive exchange rate.');
+        return;
+      }
+
+      var localBaseRate = getLocalBaseRate(draftCurrencies, draftLocalCurrencyCode);
+      var actualUsdRate = relativeRate * localBaseRate;
+
+      var existing = draftCurrencies.find(function(c) { return c.code === code; });
+      if (existing) {
+        existing.rate = actualUsdRate;
+      } else {
+        draftCurrencies.push({ code: code, rate: actualUsdRate, symbol: '' });
+      }
+
+      newCodeInput.value = '';
+      newRateInput.value = '';
+      renderConfigSection();
+    });
+
+    // Guaranteed execution regardless of document state when loaded inside iOS WebKit
+    function init() {
+      try {
+        loadStorageData();
+        renderApp();
+      } catch (err) {
+        // Fallback initialization
+      }
+    }
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      init();
+    } else {
+      document.addEventListener('DOMContentLoaded', init);
+      window.addEventListener('load', init);
+    }
+  </script>
+
+</body>
+</html>
