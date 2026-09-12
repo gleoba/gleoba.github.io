@@ -29,6 +29,12 @@ In this blog, we'll compare the leading long-term storage solutions for observab
 - **Cortex** (and its successor Grafana Mimir) offers multi-tenant capabilities and can store metrics either as compressed chunks or blocks similar to Thanos.
 - **VictoriaMetrics** features a custom LSM-tree storage optimized for high-performance queries but traditionally stores data locally rather than directly integrating with object storage.
 
+### What Thanos Adds to Prometheus
+
+Thanos is often easiest to understand as a set of independently deployable components rather than as a replacement for Prometheus. A **Sidecar** runs beside Prometheus and uploads TSDB blocks to object storage. **Store Gateway** reads those historical blocks, while **Querier** presents a single PromQL endpoint across live Prometheus instances and object storage. In a high-availability pair, Querier can deduplicate the replica series. The **Compactor** then compacts blocks and creates downsampled data for efficient long-range queries. **Receive** and **Ruler** are optional components for remote-write ingestion and centralized rule evaluation.
+
+This decomposition is the practical reason Thanos is a natural incremental path for an existing Prometheus estate: teams can begin with durable retention and a global query view, then add ingestion or rule-evaluation components only when they need them. See the [Thanos component documentation](https://thanos.io/tip/thanos/getting-started.md/) and [Compactor documentation](https://thanos.io/tip/components/compact.md/) for deployment details.
+
 ### Extending Metrics Beyond Observability
 
 #### Storage Formats and Data Lake Integration
