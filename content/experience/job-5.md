@@ -5,7 +5,7 @@ title: "Consulting Architect"
 jobTitle: "Software and Solution Architect"
 company: "Freelancer"
 location: "Israel"
-duration: "March 2024 –"
+duration: "March 2024 – April 2025"
 companyLogo: "images/experience/se-logo-small.png"
 
 ---
