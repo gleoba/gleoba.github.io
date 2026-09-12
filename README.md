@@ -56,6 +56,9 @@ or
 
 * open local [site]: http://localhost:1313/
 
+### GIT standards
+[instructions for change log documentation]: .github/workflows/release_notes_readme.md
+
 ### deploy and run action in GitHub
 * it's possible to run it manualy via [workflows-at-github.com]: https://github.com/gleoba/gleoba.github.io/actions/workflows/hugo.yaml
 
