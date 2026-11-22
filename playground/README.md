@@ -13,12 +13,16 @@ In **Configure → Add currency**, enter a currency code and its rate per unit o
 
 Use **Fetch latest rates** to update supported currencies in the draft. **Save & return** applies the changes; **Cancel** discards them.
 
+The notification bar appears below the header on both screens. Routine confirmations such as **Settings saved** disappear after six seconds. Hovering over a confirmation or focusing its dismiss button gives you more time to read it.
+
+Violet announcements stay until dismissed and can appear again after a page reload. Select an announcement to expand its details and follow its link. Orange warnings explain partial results or changes that could be lost. Red errors explain failed operations. Both stay available until you dismiss them or the affected operation is retried or superseded.
+
 ## ROADMAP
 
 ### general capabilities
 * add GitHub/gh cli - MCP for agentic Issue create, PR push, release create etc.
 
 ### FUTURE of Currency
-* add status popup/top-banner with link to description of the newest features from the recent releases
-* add version number at the footer, test version refresh on mobile clients
-* add agentic capability to fetch and update exchange rates
+
+- [ ] Display the calculator's release version in the footer.
+- [ ] After deploying a new version, refresh a previously opened copy on a phone and confirm the footer shows the new version.

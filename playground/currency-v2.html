@@ -59,7 +59,7 @@
     :focus-visible { outline: 3px solid #fde68a; outline-offset: 2px; }
     [aria-invalid="true"] { border-color: var(--error); }
     .error { color: var(--error); }
-    .error:empty, #notice:empty { margin: 0; }
+    .error:empty { margin: 0; }
     .field .error:empty { display: none; }
     #amount { font-size: 1.5rem; font-variant-numeric: tabular-nums; }
     #base-code { color: #34d399; }
@@ -97,7 +97,33 @@
     .edit-row, .add-fields { display: grid; gap: .75rem; }
     .edit-row { align-items: end; }
     .actions { justify-content: start; }
-    #notice:not(:empty) { margin-block: 1rem; }
+    #notifications:not(:empty) {
+      position: sticky; inset-block-start: 0; z-index: 1;
+      display: grid; gap: .375rem; max-block-size: 42vh; overflow: auto;
+      margin-block-end: 1rem; padding-block: .25rem; background: var(--bg);
+    }
+    .notification {
+      --ink: #a7f3d0; --surface: #14342f;
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: start; gap: .65rem; padding: .25rem .5rem .25rem .875rem;
+      border: 1px solid var(--line); border-inline-start: .25rem solid var(--ink);
+      border-radius: .6rem; background: var(--surface); overflow-wrap: anywhere;
+    }
+    .notification[data-type="attention"] { --ink: #c4b5fd; --surface: #28243f; }
+    .notification[data-type="warning"] { --ink: #fdba74; --surface: #36291f; }
+    .notification[data-type="error"] { --ink: #fda4af; --surface: #3c232d; }
+    .notification-icon, .notification button, .notification a { color: var(--ink); }
+    .notification-icon { line-height: 2.75rem; font-weight: 700; }
+    .notification button { background: transparent; border-color: transparent; padding: .25rem; }
+    .notification button:hover { border-color: var(--ink); }
+    .notification summary, .notification-title { padding-block: .625rem; }
+    .notification summary { cursor: pointer; }
+    .notification details p, .notification details a { margin-block-end: .5rem; }
+    .notification a { display: inline-block; }
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden;
+      clip-path: inset(50%); white-space: nowrap;
+    }
     footer { padding-block: .75rem; }
     @container card (max-width: 18rem) {
       .tip { padding-inline: .375rem; font-size: .8125rem; }
@@ -133,7 +159,9 @@
     <button id="configure" type="button"><span id="configure-icon" aria-hidden="true">⚙️</span> <span id="configure-label">Configure</span></button>
   </header>
   <main>
-    <p id="notice" role="status"></p>
+    <section id="notifications" aria-label="Notifications"></section>
+    <div class="sr-only" id="status-announcement" role="status"></div>
+    <div class="sr-only" id="error-announcement" role="alert"></div>
     <div id="calculator" class="layout">
       <section class="card amount-card">
         <h2><label for="amount">Local amount · <span id="base-code"></span></label></h2>
@@ -175,7 +203,7 @@
             <h2 id="rates-heading">Exchange rates</h2>
             <button type="button" id="refresh-rates">Fetch latest rates</button>
           </div>
-          <p class="hint" id="rates-status" role="status">Changes take effect when you save.</p>
+          <p class="hint" id="rates-status">Changes take effect when you save.</p>
           <div id="rates" class="stack"></div>
         </section>
         <div class="actions">
@@ -201,6 +229,91 @@
 'use strict';
 const $ = id => document.getElementById(id);
 const copyRow = id => $(id).content.firstElementChild.cloneNode(true);
+const notifications = $('notifications');
+const dismissedAnnouncements = new Set(); // A full page load starts a new visit.
+const noticeIcons = {info: 'ⓘ', attention: '✦', warning: '⚠', error: '!'};
+let lastAppFocus;
+document.addEventListener('focusin', event => {
+  if (!notifications.contains(event.target)) lastAppFocus = event.target;
+});
+
+function clearNotice(key) {
+  const bar = $('notice-' + key);
+  if (!bar) return;
+  if (bar.contains(document.activeElement)) {
+    const neighbor = bar.nextElementSibling || bar.previousElementSibling;
+    const fallback = lastAppFocus?.isConnected && lastAppFocus.getClientRects().length
+      ? lastAppFocus : $('configure');
+    (neighbor?.querySelector('summary, button') || fallback).focus();
+  }
+  clearTimeout(bar.dismissTimer);
+  bar.remove();
+}
+
+function showNotice(key, title, {type = 'info', details, link} = {}) {
+  if (type === 'attention' && dismissedAnnouncements.has(key)) return;
+  clearNotice(key);
+  const bar = document.createElement('div');
+  bar.className = 'notification';
+  bar.id = 'notice-' + key;
+  bar.dataset.type = type;
+  const icon = document.createElement('span');
+  icon.className = 'notification-icon';
+  icon.setAttribute('aria-hidden', 'true');
+  icon.textContent = noticeIcons[type];
+  const expandable = Boolean(details || link);
+  const content = document.createElement(expandable ? 'details' : 'p');
+  const label = type === 'warning' ? 'Warning: ' : type === 'error' ? 'Error: ' : '';
+  if (expandable) {
+    const summary = document.createElement('summary');
+    summary.textContent = label + title;
+    content.append(summary);
+    if (details) {
+      const p = document.createElement('p');
+      p.textContent = details;
+      content.append(p);
+    }
+    if (link) {
+      const a = document.createElement('a');
+      a.href = link.href;
+      a.textContent = link.text;
+      content.append(a);
+    }
+  } else {
+    content.className = 'notification-title';
+    content.textContent = label + title;
+  }
+  const close = document.createElement('button');
+  close.type = 'button';
+  close.textContent = '×';
+  close.setAttribute('aria-label', 'Dismiss notification: ' + title);
+  close.addEventListener('click', () => {
+    if (type === 'attention') dismissedAnnouncements.add(key);
+    clearNotice(key);
+  });
+  bar.append(icon, content, close);
+  notifications.prepend(bar);
+  notifications.scrollTop = 0;
+  const announcement = label + title + (expandable ? ' Details available.' : '');
+  if (typeof document.ariaNotify === 'function') {
+    document.ariaNotify(announcement, {priority: type === 'error' ? 'high' : 'normal'});
+  } else {
+    $(type === 'error' ? 'error-announcement' : 'status-announcement').replaceChildren(announcement);
+  }
+  if (type === 'info' && !expandable) {
+    function scheduleDismissal() {
+      clearTimeout(bar.dismissTimer);
+      if (bar.isConnected && !bar.matches(':hover, :focus-within')) {
+        bar.dismissTimer = setTimeout(() => clearNotice(key), 6000);
+      }
+    }
+    bar.addEventListener('pointerenter', () => clearTimeout(bar.dismissTimer));
+    bar.addEventListener('pointerleave', scheduleDismissal);
+    bar.addEventListener('focusin', () => clearTimeout(bar.dismissTimer));
+    bar.addEventListener('focusout', () => queueMicrotask(scheduleDismissal));
+    scheduleDismissal();
+  }
+}
 const defaults = {
   base: 'CZK',
   currencies: [
@@ -362,6 +475,7 @@ const ratesStatus = $('rates-status');
 let pendingRefresh;
 
 function resetRefresh() {
+  clearNotice('rates');
   pendingRefresh?.abort();
   pendingRefresh = undefined;
   refreshButton.disabled = !draft || draft.currencies.length < 2;
@@ -371,6 +485,7 @@ function resetRefresh() {
 }
 
 refreshButton.addEventListener('click', async () => {
+  clearNotice('rates');
   const base = draft.base;
   const controller = new AbortController();
   pendingRefresh = controller;
@@ -411,16 +526,24 @@ refreshButton.addEventListener('click', async () => {
     const period = dates[0] === dates.at(-1) ? dates[0] : dates[0] + ' to ' + dates.at(-1);
     const result = dates.length ? 'Frankfurter rates dated ' + period + '. Save to apply.' : '';
     const missing = skipped.length ? 'No usable quote for ' + skipped.join(', ') + '. Kept your entries.' : '';
-    ratesStatus.textContent = [result, missing].filter(Boolean).join(' ');
+    if (skipped.length) {
+      showNotice('rates', dates.length ? 'Some rates could not be updated.' : 'No rates could be updated.', {
+        type: 'warning', details: [missing, result].filter(Boolean).join(' ')
+      });
+    } else {
+      showNotice('rates', result);
+    }
   } catch (error) {
     if (pendingRefresh !== controller) return;
-    ratesStatus.textContent = error.message === 'unsupported base'
-      ? 'Frankfurter has no rates for base ' + base + '. You can enter rates manually.'
-      : 'Could not fetch rates. Your entries are unchanged. Try again or enter rates manually.';
+    showNotice('rates', error.message === 'unsupported base'
+      ? 'Frankfurter has no rates for base ' + base + '.' : 'Could not fetch rates.', {
+      type: 'error', details: 'Your entries are unchanged. Try again or enter rates manually.'
+    });
   } finally {
     if (pendingRefresh === controller) {
       pendingRefresh = undefined;
       refreshButton.disabled = false;
+      ratesStatus.textContent = 'Changes take effect when you save.';
     }
   }
 });
@@ -453,7 +576,7 @@ function renderSettings() {
       renderSettings();
       const next = $('rates').querySelector('button') || $('code');
       next.focus();
-      $('notice').textContent = c.code + ' removed from draft.';
+      showNotice('settings', c.code + ' removed from draft.');
     });
     $('rates').append(row);
   }
@@ -463,7 +586,7 @@ function clearAdd() {
   errorFor($('code'), '');
   errorFor($('rate'), '');
 }
-function closeSettings(message) {
+function closeSettings() {
   clearCodeFeedback();
   draft = undefined;
   resetRefresh();
@@ -471,13 +594,13 @@ function closeSettings(message) {
   $('calculator').hidden = false;
   $('configure-icon').textContent = '⚙️';
   $('configure-label').textContent = 'Configure';
-  $('notice').textContent = message;
   renderCalculator();
   $('configure').focus();
 }
 $('configure').addEventListener('click', () => {
   if (draft) {
-    closeSettings('Changes discarded.');
+    closeSettings();
+    showNotice('settings', 'Changes discarded.');
     return;
   }
   draft = clone(saved);
@@ -487,7 +610,7 @@ $('configure').addEventListener('click', () => {
   $('settings').hidden = false;
   $('configure-icon').textContent = '✕';
   $('configure-label').textContent = 'Cancel';
-  $('notice').textContent = '';
+  clearNotice('settings');
   $('settings-heading').focus();
 });
 $('base').addEventListener('change', () => {
@@ -522,6 +645,7 @@ function currencyCatalog() {
 }
 let codeRevision = 0;
 function clearCodeFeedback() {
+  clearNotice('catalog');
   codeRevision++;
   errorFor($('code'), '');
   $('code-options').replaceChildren();
@@ -546,7 +670,7 @@ function addCurrency(code, symbol) {
   clearAdd();
   renderSettings();
   $('code').focus();
-  $('notice').textContent = code + ' added to draft.';
+  showNotice('settings', code + ' added to draft.');
 }
 $('add-form').addEventListener('submit', async event => {
   event.preventDefault();
@@ -586,23 +710,41 @@ $('add-form').addEventListener('submit', async event => {
   }
   codeOption('Add ' + code + ' manually', () => addCurrency(code, ''));
   $('code-options').firstElementChild.focus();
+  if (!catalog) showNotice('catalog', 'Currency lookup unavailable.', {
+    type: 'warning', details: 'Retry Add or choose the manual rate option under Currency code.'
+  });
 });
 $('reset').addEventListener('click', () => {
   draft = clone(defaults);
   clearAdd();
   renderSettings();
-  $('notice').textContent = 'Defaults restored in the draft. Save to keep them or Cancel to undo.';
+  showNotice('settings', 'Defaults restored in the draft. Save to keep them or Cancel to undo.');
 });
 $('rates-form').addEventListener('submit', event => {
   event.preventDefault();
   if (!readRateEdits()) return;
   saved = draft;
-  let message = 'Settings saved.';
-  try { localStorage.setItem(storageKey, JSON.stringify(saved)); }
-  catch { message = 'Settings applied for this visit. Browser storage is unavailable.'; }
-  closeSettings(message);
+  closeSettings();
+  clearNotice('settings');
+  try {
+    localStorage.setItem(storageKey, JSON.stringify(saved));
+    clearNotice('storage');
+    showNotice('settings', 'Settings saved.');
+  } catch {
+    showNotice('storage', 'Settings applied for this visit only.', {
+      type: 'warning', details: 'Browser storage is unavailable. Reloading the page will lose these changes.'
+    });
+  }
 });
 renderCalculator();
+showNotice('currency-suggestions', 'Currency code suggestions are available.', {
+  type: 'attention',
+  details: 'In Configure, try adding RU. Choose RUB from the suggestions to use the ruble symbol automatically.',
+  link: {
+    href: 'https://github.com/gleoba/gleoba.github.io/blob/master/playground/README.md#currency-converter-v2',
+    text: 'Read the currency converter guide'
+  }
+});
 </script>
 </body>
 </html>
