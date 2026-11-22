@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Currency &amp; Tip Calculator</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font: 100%/1.5 system-ui, sans-serif;
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --text: #f8fafc;
+      --soft: #c1ccdc;
+      --accent: #6ee7b7;
+      --line: #475569;
+      --error: #fda4af;
+    }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      min-block-size: 100dvh;
+    }
+    .app {
+      container: app / inline-size;
+      max-inline-size: 64rem; margin-inline: auto;
+      padding: clamp(.875rem, 3vw, 2rem);
+    }
+    header, .actions, .result-row, .rates-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: .75rem;
+    }
+    header { padding-block-end: 1rem; border-block-end: 1px solid var(--line); }
+    header p, footer, .hint, small { color: var(--soft); }
+    p, h1, h2, ul { margin: 0; }
+    h1, h2 { text-wrap: balance; line-height: 1.2; overflow-wrap: anywhere; }
+    header > div { min-inline-size: 0; }
+    h1 { font-size: clamp(1.45rem, 1rem + 2vw, 2.3rem); color: var(--accent); }
+    h2 { font-size: 1.2rem; }
+    main { margin-block: 1.25rem; }
+    .stack, .layout, .card, .field, ul { display: grid; gap: 1rem; align-content: start; }
+    .card {
+      container: card / inline-size;
+      border: 1px solid var(--line); border-radius: .9rem; padding: 1rem;
+      background: var(--panel); min-inline-size: 0;
+    }
+    .field { gap: .35rem; }
+    .hint, small, footer { font-size: .875rem; }
+    input, select, button {
+      font: inherit; color: inherit; min-block-size: max(44px, 2.75rem);
+      padding: .5rem .75rem; border: 1px solid #8191a7; border-radius: .5rem;
+      background: var(--bg);
+    }
+    input, select { inline-size: 100%; min-inline-size: 0; }
+    button { cursor: pointer; font-weight: 600; min-inline-size: 44px; }
+    button:hover { border-color: var(--accent); }
+    .primary { background: var(--accent); color: #082f28; border-color: transparent; }
+    :focus-visible { outline: 3px solid #fde68a; outline-offset: 2px; }
+    [aria-invalid="true"] { border-color: var(--error); }
+    .error { color: var(--error); }
+    .error:empty, #notice:empty { margin: 0; }
+    .field .error:empty { display: none; }
+    #amount { font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+    .result-row, .tip, .edit-row { padding: .75rem; border-radius: .6rem; background: var(--bg); }
+    .result-row small, .tip span { display: block; }
+    .result-row strong, .tip strong { color: var(--accent); font-variant-numeric: tabular-nums; }
+    .result-row, .tip { overflow-wrap: anywhere; }
+    ul { list-style: none; padding: 0; gap: .5rem; }
+    .tip-grid, .edit-row, .add-fields { display: grid; gap: .75rem; }
+    .edit-row { align-items: end; }
+    .actions { justify-content: start; }
+    #notice:not(:empty) { margin-block: 1rem; }
+    footer { padding-block: .75rem; }
+    @container card (min-width: 19rem) {
+      .tip-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @container card (min-width: 21rem) {
+      .edit-row { grid-template-columns: minmax(0, 1fr) auto; }
+    }
+    @container card (min-width: 32rem) {
+      @supports (grid-template-rows: subgrid) {
+        .add-fields {
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) auto;
+          row-gap: .35rem;
+        }
+        .add-fields > .field {
+          grid-row: 1 / span 3;
+          grid-template-rows: subgrid;
+        }
+        .add-fields > button { grid-column: 3; grid-row: 2; }
+      }
+    }
+    @container app (min-width: 42rem) {
+      #calculator { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+      .amount-card { grid-column: 1 / -1; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div><h1 lang="ru">Валютная шпаргалка</h1><p>Currency &amp; Tip Calculator</p></div>
+    <button id="configure" type="button">Configure</button>
+  </header>
+  <main>
+    <p id="notice" role="status"></p>
+    <div id="calculator" class="layout">
+      <section class="card amount-card">
+        <h2><label for="amount">Local amount · <span id="base-code"></span></label></h2>
+        <div class="field">
+          <input id="amount" type="text" inputmode="decimal" aria-describedby="amount-hint amount-error" placeholder="0">
+          <small id="amount-hint"></small>
+          <p class="error" id="amount-error" aria-live="polite"></p>
+        </div>
+      </section>
+      <section class="card">
+        <h2>Converted amounts</h2><ul id="conversions"></ul>
+        <p class="hint" id="empty" hidden>Add a currency in Configure to see conversions.</p>
+      </section>
+      <section class="card">
+        <h2>Tip assistant</h2><ul id="tips" class="tip-grid"></ul>
+      </section>
+    </div>
+    <div id="settings" class="stack" hidden>
+      <section class="card">
+        <h2 id="settings-heading" tabindex="-1">Configuration</h2>
+        <div class="field"><label for="base">Local currency</label><select id="base"></select></div>
+      </section>
+      <form id="add-form" class="card" aria-labelledby="add-heading" novalidate>
+        <h2 id="add-heading">Add currency</h2>
+        <div class="add-fields">
+          <div class="field">
+            <label for="code">Currency code</label>
+            <input id="code" required maxlength="5" autocapitalize="characters" spellcheck="false" aria-describedby="code-hint code-error">
+            <div><small id="code-hint">1–5 letters, e.g. USD</small><p id="code-error" class="error"></p></div>
+          </div>
+          <div class="field"><label for="rate">Units per 1 <span id="add-base"></span></label><input id="rate" type="number" step="any" required aria-describedby="rate-error"><p id="rate-error" class="error"></p></div>
+          <button class="primary">Add</button>
+        </div>
+      </form>
+      <form id="rates-form" class="stack" aria-labelledby="rates-heading">
+        <section class="card">
+          <div class="rates-toolbar">
+            <h2 id="rates-heading">Exchange rates</h2>
+            <button type="button" id="refresh-rates">Fetch latest rates</button>
+          </div>
+          <p class="hint" id="rates-status" role="status">Changes take effect when you save.</p>
+          <div id="rates" class="stack"></div>
+        </section>
+        <div class="actions">
+          <button class="primary">Save &amp; return</button>
+          <button type="button" id="reset">Reset to defaults</button>
+        </div>
+      </form>
+    </div>
+  </main>
+  <footer>Made with love by @Gleoba</footer>
+</div>
+<template id="conversion-row"><li class="result-row"><div><b></b><small></small></div><strong></strong></li></template>
+<template id="tip-row"><li class="tip"><b></b><span></span><strong></strong></li></template>
+<template id="edit-row"><div class="edit-row"><div class="field"><label></label><input type="number" step="any" required><p class="error"></p></div><button type="button">Remove</button></div></template>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const copyRow = id => $(id).content.firstElementChild.cloneNode(true);
+const defaults = {
+  base: 'CZK',
+  currencies: [
+    {code: 'CZK', rate: 20.7952, symbol: 'Kč'}, {code: 'ILS', rate: 2.9805, symbol: '₪'},
+    {code: 'EUR', rate: 0.861, symbol: '€'}, {code: 'USD', rate: 1, symbol: '$'}
+  ]
+};
+const storageKey = 'travelmate_converter_v7';
+const clone = data => ({base: data.base, currencies: data.currencies.map(c => ({...c}))});
+const positive = n => Number.isFinite(n) && n > 0;
+
+function validSettings(data) {
+  if (!Array.isArray(data?.currencies) || !data.currencies.length) return false;
+  const codes = new Set();
+  for (const c of data.currencies) {
+    // The original allowed custom codes, including digits and punctuation.
+    if (!c || typeof c.code !== 'string' || !c.code.trim() || codes.has(c.code)
+        || typeof c.symbol !== 'string' || !positive(c.rate)) return false;
+    codes.add(c.code);
+  }
+  return codes.has(data.base);
+}
+function loadSettings() {
+  try {
+    const saved = localStorage.getItem(storageKey);
+    const data = saved ? JSON.parse(saved) : {
+      base: localStorage.getItem('travelmate_local_currency_v6'),
+      currencies: JSON.parse(localStorage.getItem('travelmate_currencies_v6'))
+    };
+    if (validSettings(data)) return data;
+  } catch { /* Storage can be blocked in embedded browsers. */ }
+  return clone(defaults);
+}
+let saved = loadSettings();
+let draft;
+const baseRate = data => data.currencies.find(c => c.code === data.base).rate;
+
+const numbers = new Intl.NumberFormat(undefined, {maximumFractionDigits: 2});
+const ratios = new Intl.NumberFormat(undefined, {maximumSignificantDigits: 6});
+const digits = new Intl.NumberFormat(undefined, {useGrouping: false});
+const decimal = numbers.formatToParts(1.5).find(p => p.type === 'decimal').value;
+const toAscii = text => Array.from(text, ch => {
+  const i = localDigits.indexOf(ch);
+  return i < 0 ? ch : String(i);
+}).join('');
+const localDigits = Array.from({length: 10}, (_, i) => digits.format(i));
+$('amount-hint').textContent = 'Enter an ungrouped amount, e.g. ' + numbers.format(12.5) + '.';
+
+// Accept an alternate keyboard decimal for cents. Reject a foreign grouping
+// separator followed by three digits, where interpreting it would be ambiguous.
+function parseAmount() {
+  const raw = toAscii($('amount').value.trim());
+  if (!raw) return {value: 0, normalized: ''};
+  let normalized = raw.replace(decimal, '.');
+  if (!raw.includes(decimal) && /^[0-9]*[.,][0-9]{1,2}$/.test(raw)) {
+    normalized = raw.replace(/[.,]/, '.');
+  } else if (!raw.includes(decimal) && /[.,]/.test(raw)) {
+    return null;
+  }
+  if (!/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(normalized)) return null;
+  const value = Number(normalized);
+  return Number.isFinite(value) ? {value, normalized} : null;
+}
+let conversionRows = [];
+const tipRows = [7, 10, 12, 15].map(percent => {
+  const row = copyRow('tip-row');
+  row.querySelector('b').textContent = percent + '%';
+  $('tips').append(row);
+  return {percent, tip: row.querySelector('span'), total: row.querySelector('strong')};
+});
+function errorFor(input, message) {
+  input.setCustomValidity(message);
+  input.setAttribute('aria-invalid', String(Boolean(message)));
+  $(input.id + '-error').textContent = message;
+}
+function updateAmounts() {
+  const parsed = parseAmount();
+  errorFor($('amount'), parsed ? '' : 'Enter one decimal amount without thousands separators.');
+  for (const {output, ratio, symbol} of conversionRows) {
+    const result = parsed ? parsed.value * ratio : NaN;
+    output.textContent = Number.isFinite(result) ? (symbol + ' ' + numbers.format(result)).trim() : '—';
+  }
+  for (const row of tipRows) {
+    const tip = parsed ? parsed.value * (row.percent / 100) : NaN;
+    const total = parsed ? parsed.value + tip : NaN;
+    row.tip.textContent = Number.isFinite(tip) ? 'Tip ' + numbers.format(tip) : 'Tip —';
+    row.total.textContent = Number.isFinite(total) ? 'Total ' + numbers.format(total) + ' ' + saved.base : 'Total —';
+  }
+}
+$('amount').addEventListener('input', updateAmounts);
+$('amount').addEventListener('blur', () => {
+  const parsed = parseAmount();
+  if (!parsed?.normalized) return;
+  const [whole, fraction] = parsed.normalized.split('.');
+  const normalized = (whole.replace(/^0+(?=\d)/, '') || '0') + (fraction ? decimal + fraction : '');
+  $('amount').value = normalized.replace(/\d/g, d => localDigits[Number(d)]);
+});
+function renderCalculator() {
+  $('base-code').textContent = saved.base;
+  $('conversions').replaceChildren();
+  conversionRows = saved.currencies.filter(c => c.code !== saved.base).map(c => {
+    const row = copyRow('conversion-row');
+    const ratio = c.rate / baseRate(saved);
+    row.querySelector('b').textContent = c.code;
+    row.querySelector('small').textContent = '1 ' + saved.base + ' = ' + ratios.format(ratio) + ' ' + c.code;
+    $('conversions').append(row);
+    return {output: row.querySelector('strong'), ratio, symbol: c.symbol};
+  });
+  $('empty').hidden = conversionRows.length > 0;
+  updateAmounts();
+}
+function checkRate(input) {
+  const relative = input.valueAsNumber;
+  const absolute = relative * baseRate(draft);
+  const message = positive(relative) && positive(absolute) ? '' : 'Enter a finite rate greater than zero.';
+  errorFor(input, message);
+  return !message;
+}
+function readRateEdits(excludeCode) {
+  const edits = [];
+  for (const input of $('rates').querySelectorAll('input')) {
+    if (input.dataset.code === excludeCode || input.value === input.defaultValue) continue;
+    if (!checkRate(input)) {
+      input.reportValidity();
+      input.focus();
+      return false;
+    }
+    edits.push([input.dataset.code, input.valueAsNumber * baseRate(draft)]);
+  }
+  for (const [code, rate] of edits) draft.currencies.find(c => c.code === code).rate = rate;
+  return true;
+}
+const refreshButton = $('refresh-rates');
+const ratesStatus = $('rates-status');
+let pendingRefresh;
+
+function resetRefresh() {
+  pendingRefresh?.abort();
+  pendingRefresh = undefined;
+  refreshButton.disabled = !draft || draft.currencies.length < 2;
+  ratesStatus.textContent = refreshButton.disabled
+    ? 'Add another currency to fetch rates.'
+    : 'Changes take effect when you save.';
+}
+
+refreshButton.addEventListener('click', async () => {
+  const base = draft.base;
+  const controller = new AbortController();
+  pendingRefresh = controller;
+  refreshButton.disabled = true;
+  ratesStatus.textContent = 'Fetching reference rates from Frankfurter…';
+  try {
+    // Fetch one base snapshot so a custom quote code cannot invalidate the request.
+    const url = new URL('https://api.frankfurter.dev/v2/rates');
+    url.searchParams.set('base', base);
+    const signal = AbortSignal.any([controller.signal, AbortSignal.timeout(12000)]);
+    const response = await fetch(url, {signal, credentials: 'omit', referrerPolicy: 'no-referrer'});
+    if (response.status === 422 || response.status === 404) {
+      throw new Error('unsupported base');
+    }
+    if (!response.ok) throw new Error('request failed');
+    const rows = await response.json();
+    if (pendingRefresh !== controller) return;
+    const quotes = new Map();
+    for (const row of rows) {
+      if (row?.base === base && positive(row.rate) && /^\d{4}-\d{2}-\d{2}$/.test(row.date)) {
+        quotes.set(row.quote, row);
+      }
+    }
+    const dates = [];
+    const skipped = [];
+    for (const input of $('rates').querySelectorAll('input')) {
+      const code = input.dataset.code;
+      const quote = quotes.get(code);
+      if (!quote || !positive(quote.rate * baseRate(draft))) {
+        skipped.push(code);
+        continue;
+      }
+      input.value = String(quote.rate);
+      checkRate(input);
+      dates.push(quote.date);
+    }
+    dates.sort();
+    const period = dates[0] === dates.at(-1) ? dates[0] : dates[0] + ' to ' + dates.at(-1);
+    const result = dates.length ? 'Frankfurter rates dated ' + period + '. Save to apply.' : '';
+    const missing = skipped.length ? 'No usable quote for ' + skipped.join(', ') + '. Kept your entries.' : '';
+    ratesStatus.textContent = [result, missing].filter(Boolean).join(' ');
+  } catch (error) {
+    if (pendingRefresh !== controller) return;
+    ratesStatus.textContent = error.message === 'unsupported base'
+      ? 'Frankfurter has no rates for base ' + base + '. You can enter rates manually.'
+      : 'Could not fetch rates. Your entries are unchanged. Try again or enter rates manually.';
+  } finally {
+    if (pendingRefresh === controller) {
+      pendingRefresh = undefined;
+      refreshButton.disabled = false;
+    }
+  }
+});
+$('rates').addEventListener('input', resetRefresh);
+function renderSettings() {
+  resetRefresh();
+  $('base').replaceChildren(...draft.currencies.map(c => new Option(c.code, c.code)));
+  $('base').value = draft.base;
+  $('add-base').textContent = draft.base;
+  $('rates').replaceChildren();
+  for (const [index, c] of draft.currencies.entries()) {
+    if (c.code === draft.base) continue;
+    const row = copyRow('edit-row');
+    const input = row.querySelector('input');
+    input.id = 'edit-' + index;
+    input.dataset.code = c.code;
+    input.defaultValue = String(c.rate / baseRate(draft));
+    row.querySelector('p').id = input.id + '-error';
+    input.setAttribute('aria-describedby', input.id + '-error');
+    const label = row.querySelector('label');
+    label.htmlFor = input.id;
+    label.textContent = c.code + ' per 1 ' + draft.base;
+    input.addEventListener('input', () => checkRate(input));
+    const remove = row.querySelector('button');
+    remove.setAttribute('aria-label', 'Remove ' + c.code);
+    remove.addEventListener('click', () => {
+      if (!readRateEdits(c.code)) return;
+      draft.currencies.splice(index, 1);
+      renderSettings();
+      const next = $('rates').querySelector('button') || $('code');
+      next.focus();
+      $('notice').textContent = c.code + ' removed from draft.';
+    });
+    $('rates').append(row);
+  }
+}
+function clearAdd() {
+  $('add-form').reset();
+  errorFor($('code'), '');
+  errorFor($('rate'), '');
+}
+function closeSettings(message) {
+  draft = undefined;
+  resetRefresh();
+  $('settings').hidden = true;
+  $('calculator').hidden = false;
+  $('configure').textContent = 'Configure';
+  $('notice').textContent = message;
+  renderCalculator();
+  $('configure').focus();
+}
+$('configure').addEventListener('click', () => {
+  if (draft) {
+    closeSettings('Changes discarded.');
+    return;
+  }
+  draft = clone(saved);
+  clearAdd();
+  renderSettings();
+  $('calculator').hidden = true;
+  $('settings').hidden = false;
+  $('configure').textContent = 'Cancel';
+  $('notice').textContent = '';
+  $('settings-heading').focus();
+});
+$('base').addEventListener('change', () => {
+  if (!readRateEdits()) {
+    $('base').value = draft.base;
+    return;
+  }
+  draft.base = $('base').value;
+  $('rate').value = '';
+  errorFor($('rate'), '');
+  renderSettings();
+});
+$('code').addEventListener('input', () => errorFor($('code'), ''));
+$('rate').addEventListener('input', () => checkRate($('rate')));
+$('add-form').addEventListener('submit', event => {
+  event.preventDefault();
+  const code = $('code').value.trim().toUpperCase();
+  let message = '';
+  if (!/^[A-Z]{1,5}$/.test(code)) message = 'Enter 1 to 5 letters.';
+  else if (draft.currencies.some(c => c.code === code)) message = 'This currency is already in the list.';
+  errorFor($('code'), message);
+  checkRate($('rate'));
+  if (!$('add-form').reportValidity() || !readRateEdits()) return;
+  draft.currencies.push({code, symbol: '', rate: $('rate').valueAsNumber * baseRate(draft)});
+  clearAdd();
+  renderSettings();
+  $('code').focus();
+  $('notice').textContent = code + ' added to draft.';
+});
+$('reset').addEventListener('click', () => {
+  draft = clone(defaults);
+  clearAdd();
+  renderSettings();
+  $('notice').textContent = 'Defaults restored in the draft. Save to keep them or Cancel to undo.';
+});
+$('rates-form').addEventListener('submit', event => {
+  event.preventDefault();
+  if (!readRateEdits()) return;
+  saved = draft;
+  let message = 'Settings saved.';
+  try { localStorage.setItem(storageKey, JSON.stringify(saved)); }
+  catch { message = 'Settings applied for this visit. Browser storage is unavailable.'; }
+  closeSettings(message);
+});
+renderCalculator();
+</script>
+</body>
+</html>

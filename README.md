@@ -75,7 +75,7 @@ e.g.
 gh workflow run hugo.yaml
 
 > 3. check status of the worflow run
-gh run list --workflow=hugo.yaml
+gh run list --workflow=hugo.yaml --limit=2
 
 > 4. [optional] cleanup
 git status --ignored --short | grep '^!!' | awk '{print substr($0, 4)}' | xargs rm -r
