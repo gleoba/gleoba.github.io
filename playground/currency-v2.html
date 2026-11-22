@@ -62,18 +62,34 @@
     .error:empty, #notice:empty { margin: 0; }
     .field .error:empty { display: none; }
     #amount { font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+    #base-code { color: #34d399; }
     .result-row, .tip, .edit-row { padding: .75rem; border-radius: .6rem; background: var(--bg); }
-    .result-row small, .tip span { display: block; }
-    .result-row strong, .tip strong { color: var(--accent); font-variant-numeric: tabular-nums; }
+    .result-row { border: 1px solid #334155; }
+    .result-row small { margin-inline-start: .45em; }
+    .result-row strong { color: var(--accent); font-variant-numeric: tabular-nums; }
+    .tip {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: .375rem; border: 1px solid; padding: .3rem .65rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .tip[data-percent="7"]  { background: rgb(6 78 59 / 50%); border-color: rgb(4 120 87 / 60%); color: #6ee7b7; }
+    .tip[data-percent="10"] { background: rgb(12 74 110 / 50%); border-color: rgb(3 105 161 / 60%); color: #7dd3fc; }
+    .tip[data-percent="12"] { background: rgb(49 46 129 / 50%); border-color: rgb(67 56 202 / 60%); color: #a5b4fc; }
+    .tip[data-percent="15"] { background: rgb(88 28 135 / 50%); border-color: rgb(126 34 206 / 60%); color: #d8b4fe; }
+    .tip b { padding: .125em .375em; border-radius: .25rem; background: rgb(15 23 42 / 40%); }
+    .tip-values { text-align: center; font-size: .875rem; }
+    .tip-symbol { max-inline-size: 5ch; font-weight: 700; }
     .result-row, .tip { overflow-wrap: anywhere; }
     ul { list-style: none; padding: 0; gap: .5rem; }
-    .tip-grid, .edit-row, .add-fields { display: grid; gap: .75rem; }
+    .tip-grid { gap: .375rem; }
+    .edit-row, .add-fields { display: grid; gap: .75rem; }
     .edit-row { align-items: end; }
     .actions { justify-content: start; }
     #notice:not(:empty) { margin-block: 1rem; }
     footer { padding-block: .75rem; }
-    @container card (min-width: 19rem) {
-      .tip-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    @container card (max-width: 18rem) {
+      .tip { padding-inline: .375rem; gap: .25rem; font-size: .8125rem; }
+      .tip-values { font-size: inherit; }
     }
     @container card (min-width: 21rem) {
       .edit-row { grid-template-columns: minmax(0, 1fr) auto; }
@@ -92,7 +108,7 @@
       }
     }
     @container app (min-width: 42rem) {
-      #calculator { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+      #calculator { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .amount-card { grid-column: 1 / -1; }
     }
   </style>
@@ -101,7 +117,7 @@
 <div class="app">
   <header>
     <div><h1 lang="ru">Валютная шпаргалка</h1><p>Currency &amp; Tip Calculator</p></div>
-    <button id="configure" type="button">Configure</button>
+    <button id="configure" type="button"><span id="configure-icon" aria-hidden="true">⚙️</span> <span id="configure-label">Configure</span></button>
   </header>
   <main>
     <p id="notice" role="status"></p>
@@ -115,11 +131,11 @@
         </div>
       </section>
       <section class="card">
-        <h2>Converted amounts</h2><ul id="conversions"></ul>
+        <h2><span aria-hidden="true">💱</span> Converted amounts</h2><ul id="conversions"></ul>
         <p class="hint" id="empty" hidden>Add a currency in Configure to see conversions.</p>
       </section>
       <section class="card">
-        <h2>Tip assistant</h2><ul id="tips" class="tip-grid"></ul>
+        <h2><span aria-hidden="true">🪙</span> Tip assistant</h2><ul id="tips" class="tip-grid"></ul>
       </section>
     </div>
     <div id="settings" class="stack" hidden>
@@ -157,8 +173,14 @@
   </main>
   <footer>Made with love by @Gleoba</footer>
 </div>
-<template id="conversion-row"><li class="result-row"><div><b></b><small></small></div><strong></strong></li></template>
-<template id="tip-row"><li class="tip"><b></b><span></span><strong></strong></li></template>
+<template id="conversion-row"><li class="result-row"><div><b></b> <small></small></div><strong></strong></li></template>
+<template id="tip-row">
+  <li class="tip">
+    <b></b>
+    <span class="tip-values"></span>
+    <span class="tip-symbol"></span>
+  </li>
+</template>
 <template id="edit-row"><div class="edit-row"><div class="field"><label></label><input type="number" step="any" required><p class="error"></p></div><button type="button">Remove</button></div></template>
 <script>
 'use strict';
@@ -202,7 +224,7 @@ let draft;
 const baseRate = data => data.currencies.find(c => c.code === data.base).rate;
 
 const numbers = new Intl.NumberFormat(undefined, {maximumFractionDigits: 2});
-const ratios = new Intl.NumberFormat(undefined, {maximumSignificantDigits: 6});
+const ratios = new Intl.NumberFormat(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 const digits = new Intl.NumberFormat(undefined, {useGrouping: false});
 const decimal = numbers.formatToParts(1.5).find(p => p.type === 'decimal').value;
 const toAscii = text => Array.from(text, ch => {
@@ -210,29 +232,20 @@ const toAscii = text => Array.from(text, ch => {
   return i < 0 ? ch : String(i);
 }).join('');
 const localDigits = Array.from({length: 10}, (_, i) => digits.format(i));
-$('amount-hint').textContent = 'Enter an ungrouped amount, e.g. ' + numbers.format(12.5) + '.';
+const amount = $('amount');
+$('amount-hint').textContent = 'Up to 8 whole digits and 2 decimal places, without grouping (e.g. ' + numbers.format(12.34) + ').';
 
-// Accept an alternate keyboard decimal for cents. Reject a foreign grouping
-// separator followed by three digits, where interpreting it would be ambiguous.
-function parseAmount() {
-  const raw = toAscii($('amount').value.trim());
-  if (!raw) return {value: 0, normalized: ''};
-  let normalized = raw.replace(decimal, '.');
-  if (!raw.includes(decimal) && /^[0-9]*[.,][0-9]{1,2}$/.test(raw)) {
-    normalized = raw.replace(/[.,]/, '.');
-  } else if (!raw.includes(decimal) && /[.,]/.test(raw)) {
-    return null;
-  }
-  if (!/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(normalized)) return null;
-  const value = Number(normalized);
-  return Number.isFinite(value) ? {value, normalized} : null;
+function normalizedAmount() {
+  const value = toAscii(amount.value).replaceAll(decimal, '.').replaceAll(',', '.');
+  return /^\d{0,8}(?:\.\d{0,2})?$/.test(value) ? value : null;
 }
 let conversionRows = [];
 const tipRows = [7, 10, 12, 15].map(percent => {
   const row = copyRow('tip-row');
+  row.dataset.percent = percent;
   row.querySelector('b').textContent = percent + '%';
   $('tips').append(row);
-  return {percent, tip: row.querySelector('span'), total: row.querySelector('strong')};
+  return {percent, values: row.querySelector('.tip-values'), symbol: row.querySelector('.tip-symbol')};
 });
 function errorFor(input, message) {
   input.setCustomValidity(message);
@@ -240,35 +253,66 @@ function errorFor(input, message) {
   $(input.id + '-error').textContent = message;
 }
 function updateAmounts() {
-  const parsed = parseAmount();
-  errorFor($('amount'), parsed ? '' : 'Enter one decimal amount without thousands separators.');
+  const normalized = normalizedAmount();
+  const value = normalized === null ? NaN : Number(normalized);
   for (const {output, ratio, symbol} of conversionRows) {
-    const result = parsed ? parsed.value * ratio : NaN;
+    const result = value * ratio;
     output.textContent = Number.isFinite(result) ? (symbol + ' ' + numbers.format(result)).trim() : '—';
   }
   for (const row of tipRows) {
-    const tip = parsed ? parsed.value * (row.percent / 100) : NaN;
-    const total = parsed ? parsed.value + tip : NaN;
-    row.tip.textContent = Number.isFinite(tip) ? 'Tip ' + numbers.format(tip) : 'Tip —';
-    row.total.textContent = Number.isFinite(total) ? 'Total ' + numbers.format(total) + ' ' + saved.base : 'Total —';
+    const tip = value * (row.percent / 100);
+    const total = value + tip;
+    const tipText = Number.isFinite(tip) ? numbers.format(tip) : '—';
+    const totalText = Number.isFinite(total) ? numbers.format(total) : '—';
+    row.values.textContent = 'Tip ' + tipText + ' · Total ' + totalText;
   }
 }
-$('amount').addEventListener('input', updateAmounts);
-$('amount').addEventListener('blur', () => {
-  const parsed = parseAmount();
-  if (!parsed?.normalized) return;
-  const [whole, fraction] = parsed.normalized.split('.');
-  const normalized = (whole.replace(/^0+(?=\d)/, '') || '0') + (fraction ? decimal + fraction : '');
-  $('amount').value = normalized.replace(/\d/g, d => localDigits[Number(d)]);
+let acceptedAmount = amount.value;
+let previousSelection;
+amount.addEventListener('beforeinput', event => {
+  if (!event.isComposing) previousSelection = [amount.selectionStart, amount.selectionEnd];
+});
+function acceptAmountEdit(event) {
+  if (event.isComposing) return;
+  if (normalizedAmount() === null) {
+    amount.value = acceptedAmount;
+    if (previousSelection) amount.setSelectionRange(...previousSelection);
+    $('amount-error').textContent = 'Edit ignored. Use up to 8 whole digits and 2 decimal places without grouping.';
+  } else {
+    acceptedAmount = amount.value;
+    $('amount-error').textContent = '';
+  }
+  previousSelection = undefined;
+  updateAmounts();
+}
+amount.addEventListener('input', acceptAmountEdit);
+amount.addEventListener('compositionend', acceptAmountEdit);
+amount.addEventListener('blur', () => {
+  const value = normalizedAmount();
+  if (value === null) return;
+  const [whole, fraction] = value.split('.');
+  const integer = whole.replace(/^0+(?=\d)/, '') || '0';
+  const normalized = value && value !== '.' ? integer + (fraction ? decimal + fraction : '') : '';
+  amount.value = normalized.replace(/\d/g, d => localDigits[Number(d)]);
+  acceptedAmount = amount.value;
+  $('amount-error').textContent = '';
+  updateAmounts();
 });
 function renderCalculator() {
   $('base-code').textContent = saved.base;
+  const base = saved.currencies.find(c => c.code === saved.base);
+  let symbol = base.symbol || base.code;
+  if (!base.symbol && /^[A-Z]{3}$/.test(base.code)) {
+    const currency = new Intl.NumberFormat(undefined, {style: 'currency', currency: base.code});
+    symbol = currency.formatToParts(0).find(part => part.type === 'currency').value;
+  }
+  for (const row of tipRows) row.symbol.textContent = symbol;
   $('conversions').replaceChildren();
   conversionRows = saved.currencies.filter(c => c.code !== saved.base).map(c => {
     const row = copyRow('conversion-row');
     const ratio = c.rate / baseRate(saved);
     row.querySelector('b').textContent = c.code;
-    row.querySelector('small').textContent = '1 ' + saved.base + ' = ' + ratios.format(ratio) + ' ' + c.code;
+    row.querySelector('small').textContent = ratios.format(ratio) + ' for 1 ' + saved.base;
     $('conversions').append(row);
     return {output: row.querySelector('strong'), ratio, symbol: c.symbol};
   });
@@ -406,7 +450,8 @@ function closeSettings(message) {
   resetRefresh();
   $('settings').hidden = true;
   $('calculator').hidden = false;
-  $('configure').textContent = 'Configure';
+  $('configure-icon').textContent = '⚙️';
+  $('configure-label').textContent = 'Configure';
   $('notice').textContent = message;
   renderCalculator();
   $('configure').focus();
@@ -421,7 +466,8 @@ $('configure').addEventListener('click', () => {
   renderSettings();
   $('calculator').hidden = true;
   $('settings').hidden = false;
-  $('configure').textContent = 'Cancel';
+  $('configure-icon').textContent = '✕';
+  $('configure-label').textContent = 'Cancel';
   $('notice').textContent = '';
   $('settings-heading').focus();
 });
