@@ -68,28 +68,41 @@
     .result-row small { margin-inline-start: .45em; }
     .result-row strong { color: var(--accent); font-variant-numeric: tabular-nums; }
     .tip {
-      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
-      align-items: center; gap: .375rem; border: 1px solid; padding: .3rem .65rem;
+      position: relative; display: grid; grid-column: 1 / -1;
+      grid-template-columns: var(--tip-columns);
+      grid-template-columns: subgrid;
+      align-items: center; column-gap: 0; border: 1px solid; padding: .3rem .65rem;
       font-variant-numeric: tabular-nums;
     }
     .tip[data-percent="7"]  { background: rgb(6 78 59 / 50%); border-color: rgb(4 120 87 / 60%); color: #6ee7b7; }
     .tip[data-percent="10"] { background: rgb(12 74 110 / 50%); border-color: rgb(3 105 161 / 60%); color: #7dd3fc; }
     .tip[data-percent="12"] { background: rgb(49 46 129 / 50%); border-color: rgb(67 56 202 / 60%); color: #a5b4fc; }
     .tip[data-percent="15"] { background: rgb(88 28 135 / 50%); border-color: rgb(126 34 206 / 60%); color: #d8b4fe; }
-    .tip b { padding: .125em .375em; border-radius: .25rem; background: rgb(15 23 42 / 40%); }
-    .tip-values { text-align: center; font-size: .875rem; }
-    .tip-symbol { max-inline-size: 5ch; font-weight: 700; }
+    .tip-start {
+      display: grid; grid-template-columns: 3em minmax(0, 1fr);
+      align-items: center; gap: .375rem; padding-inline-end: .6rem;
+    }
+    .tip b { padding: .125em; border-radius: .25rem; background: rgb(15 23 42 / 40%); text-align: center; }
+    .tip-amount, .tip-total { text-align: start; font-size: .875rem; }
+    .tip-total { grid-column: 3; }
+    .tip-symbol { grid-column: 4; margin-inline-start: .375rem; max-inline-size: 5ch; font-weight: 700; }
+    .tip-dot { position: absolute; inset-inline: 0; inline-size: max-content; margin-inline: auto; }
     .result-row, .tip { overflow-wrap: anywhere; }
     ul { list-style: none; padding: 0; gap: .5rem; }
-    .tip-grid { gap: .375rem; }
+    .tip-grid {
+      /* Reserve the left half for the badge and tip; share the widest total on the right. */
+      --tip-columns: 50% minmax(.6rem, 1fr) fit-content(36%) auto;
+      grid-template-columns: var(--tip-columns); gap: .375rem 0;
+    }
     .edit-row, .add-fields { display: grid; gap: .75rem; }
     .edit-row { align-items: end; }
     .actions { justify-content: start; }
     #notice:not(:empty) { margin-block: 1rem; }
     footer { padding-block: .75rem; }
     @container card (max-width: 18rem) {
-      .tip { padding-inline: .375rem; gap: .25rem; font-size: .8125rem; }
-      .tip-values { font-size: inherit; }
+      .tip { padding-inline: .375rem; font-size: .8125rem; }
+      .tip-start { gap: .25rem; }
+      .tip-amount, .tip-total { font-size: inherit; }
     }
     @container card (min-width: 21rem) {
       .edit-row { grid-template-columns: minmax(0, 1fr) auto; }
@@ -126,7 +139,7 @@
         <h2><label for="amount">Local amount · <span id="base-code"></span></label></h2>
         <div class="field">
           <input id="amount" type="text" inputmode="decimal" aria-describedby="amount-hint amount-error" placeholder="0">
-          <small id="amount-hint"></small>
+          <small id="amount-hint">Input your amount for conversion</small>
           <p class="error" id="amount-error" aria-live="polite"></p>
         </div>
       </section>
@@ -149,11 +162,12 @@
           <div class="field">
             <label for="code">Currency code</label>
             <input id="code" required maxlength="5" autocapitalize="characters" spellcheck="false" aria-describedby="code-hint code-error">
-            <div><small id="code-hint">1–5 letters, e.g. USD</small><p id="code-error" class="error"></p></div>
+            <div><small id="code-hint">1–5 letters, e.g. USD</small><p id="code-error" class="error" aria-live="polite"></p></div>
           </div>
           <div class="field"><label for="rate">Units per 1 <span id="add-base"></span></label><input id="rate" type="number" step="any" required aria-describedby="rate-error"><p id="rate-error" class="error"></p></div>
           <button class="primary">Add</button>
         </div>
+        <div id="code-options" class="actions" hidden></div>
       </form>
       <form id="rates-form" class="stack" aria-labelledby="rates-heading">
         <section class="card">
@@ -176,8 +190,9 @@
 <template id="conversion-row"><li class="result-row"><div><b></b> <small></small></div><strong></strong></li></template>
 <template id="tip-row">
   <li class="tip">
-    <b></b>
-    <span class="tip-values"></span>
+    <div class="tip-start"><b></b><span class="tip-amount"></span></div>
+    <span class="tip-dot" aria-hidden="true">·</span>
+    <span class="tip-total"></span>
     <span class="tip-symbol"></span>
   </li>
 </template>
@@ -233,8 +248,8 @@ const toAscii = text => Array.from(text, ch => {
 }).join('');
 const localDigits = Array.from({length: 10}, (_, i) => digits.format(i));
 const amount = $('amount');
-$('amount-hint').textContent = 'Up to 8 whole digits and 2 decimal places, without grouping (e.g. ' + numbers.format(12.34) + ').';
 
+// Up to 8 whole digits and 2 decimal places, without grouping.
 function normalizedAmount() {
   const value = toAscii(amount.value).replaceAll(decimal, '.').replaceAll(',', '.');
   return /^\d{0,8}(?:\.\d{0,2})?$/.test(value) ? value : null;
@@ -245,7 +260,7 @@ const tipRows = [7, 10, 12, 15].map(percent => {
   row.dataset.percent = percent;
   row.querySelector('b').textContent = percent + '%';
   $('tips').append(row);
-  return {percent, values: row.querySelector('.tip-values'), symbol: row.querySelector('.tip-symbol')};
+  return {percent, tip: row.querySelector('.tip-amount'), total: row.querySelector('.tip-total'), symbol: row.querySelector('.tip-symbol')};
 });
 function errorFor(input, message) {
   input.setCustomValidity(message);
@@ -264,7 +279,8 @@ function updateAmounts() {
     const total = value + tip;
     const tipText = Number.isFinite(tip) ? numbers.format(tip) : '—';
     const totalText = Number.isFinite(total) ? numbers.format(total) : '—';
-    row.values.textContent = 'Tip ' + tipText + ' · Total ' + totalText;
+    row.tip.textContent = 'Tip ' + tipText;
+    row.total.textContent = 'Total ' + totalText;
   }
 }
 let acceptedAmount = amount.value;
@@ -298,15 +314,16 @@ amount.addEventListener('blur', () => {
   $('amount-error').textContent = '';
   updateAmounts();
 });
+function currencySymbol(code, symbol) {
+  if (symbol) return symbol;
+  if (!/^[A-Z]{3}$/.test(code)) return code;
+  const format = new Intl.NumberFormat(undefined, {style: 'currency', currency: code, currencyDisplay: 'narrowSymbol'});
+  return format.formatToParts(0).find(part => part.type === 'currency').value;
+}
 function renderCalculator() {
   $('base-code').textContent = saved.base;
   const base = saved.currencies.find(c => c.code === saved.base);
-  let symbol = base.symbol || base.code;
-  if (!base.symbol && /^[A-Z]{3}$/.test(base.code)) {
-    const currency = new Intl.NumberFormat(undefined, {style: 'currency', currency: base.code});
-    symbol = currency.formatToParts(0).find(part => part.type === 'currency').value;
-  }
-  for (const row of tipRows) row.symbol.textContent = symbol;
+  for (const row of tipRows) row.symbol.textContent = currencySymbol(base.code, base.symbol);
   $('conversions').replaceChildren();
   conversionRows = saved.currencies.filter(c => c.code !== saved.base).map(c => {
     const row = copyRow('conversion-row');
@@ -314,7 +331,7 @@ function renderCalculator() {
     row.querySelector('b').textContent = c.code;
     row.querySelector('small').textContent = ratios.format(ratio) + ' for 1 ' + saved.base;
     $('conversions').append(row);
-    return {output: row.querySelector('strong'), ratio, symbol: c.symbol};
+    return {output: row.querySelector('strong'), ratio, symbol: currencySymbol(c.code, c.symbol)};
   });
   $('empty').hidden = conversionRows.length > 0;
   updateAmounts();
@@ -409,6 +426,7 @@ refreshButton.addEventListener('click', async () => {
 });
 $('rates').addEventListener('input', resetRefresh);
 function renderSettings() {
+  clearCodeFeedback();
   resetRefresh();
   $('base').replaceChildren(...draft.currencies.map(c => new Option(c.code, c.code)));
   $('base').value = draft.base;
@@ -446,6 +464,7 @@ function clearAdd() {
   errorFor($('rate'), '');
 }
 function closeSettings(message) {
+  clearCodeFeedback();
   draft = undefined;
   resetRefresh();
   $('settings').hidden = true;
@@ -481,22 +500,92 @@ $('base').addEventListener('change', () => {
   errorFor($('rate'), '');
   renderSettings();
 });
-$('code').addEventListener('input', () => errorFor($('code'), ''));
+let catalogRequest;
+function currencyCatalog() {
+  // Reuse successful lookups for this page visit; allow retry after a network error.
+  if (!catalogRequest) {
+    catalogRequest = fetch('https://api.frankfurter.dev/v2/currencies', {
+      signal: AbortSignal.timeout(8000), credentials: 'omit', referrerPolicy: 'no-referrer'
+    }).then(async response => {
+      if (!response.ok) throw new Error('Currency catalog unavailable');
+      const rows = await response.json();
+      if (!Array.isArray(rows) || !rows.length || !rows.every(row => typeof row?.iso_code === 'string')) {
+        throw new Error('Invalid currency catalog');
+      }
+      return rows;
+    }).catch(error => {
+      catalogRequest = undefined;
+      throw error;
+    });
+  }
+  return catalogRequest;
+}
+let codeRevision = 0;
+function clearCodeFeedback() {
+  codeRevision++;
+  errorFor($('code'), '');
+  $('code-options').replaceChildren();
+  $('code-options').hidden = true;
+  $('code-hint').textContent = '1–5 letters, e.g. USD';
+}
+function codeOption(label, action) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.textContent = label;
+  button.addEventListener('click', action);
+  $('code-options').append(button);
+  $('code-options').hidden = false;
+}
+$('code').addEventListener('input', clearCodeFeedback);
 $('rate').addEventListener('input', () => checkRate($('rate')));
-$('add-form').addEventListener('submit', event => {
-  event.preventDefault();
-  const code = $('code').value.trim().toUpperCase();
-  let message = '';
-  if (!/^[A-Z]{1,5}$/.test(code)) message = 'Enter 1 to 5 letters.';
-  else if (draft.currencies.some(c => c.code === code)) message = 'This currency is already in the list.';
-  errorFor($('code'), message);
+function addCurrency(code, symbol) {
+  errorFor($('code'), '');
   checkRate($('rate'));
   if (!$('add-form').reportValidity() || !readRateEdits()) return;
-  draft.currencies.push({code, symbol: '', rate: $('rate').valueAsNumber * baseRate(draft)});
+  draft.currencies.push({code, symbol: currencySymbol(code, symbol), rate: $('rate').valueAsNumber * baseRate(draft)});
   clearAdd();
   renderSettings();
   $('code').focus();
   $('notice').textContent = code + ' added to draft.';
+}
+$('add-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  clearCodeFeedback();
+  const code = $('code').value.trim().toUpperCase();
+  let message = '';
+  if (!/^[A-Z]{1,5}$/.test(code)) message = 'Enter 1 to 5 letters.';
+  else if (draft.currencies.some(c => c.code === code)) message = 'This currency is already in the list.';
+  if (message) {
+    errorFor($('code'), message);
+    $('code').reportValidity();
+    return;
+  }
+  const revision = codeRevision;
+  $('code-hint').textContent = 'Checking Frankfurter…';
+  let catalog;
+  try {
+    catalog = await currencyCatalog();
+  } catch {
+    message = 'Could not check Frankfurter. Retry Add or use a manual rate.';
+  }
+  if (revision !== codeRevision) return;
+  $('code-hint').textContent = '1–5 letters, e.g. USD';
+  const match = catalog?.find(row => row.iso_code === code);
+  if (match) {
+    addCurrency(code, match.symbol);
+    return;
+  }
+  errorFor($('code'), message || code + ' is not listed by Frankfurter.');
+  if (catalog && code.length >= 2) {
+    for (const row of catalog.filter(row => row.iso_code.startsWith(code)).slice(0, 5)) {
+      codeOption('Use ' + row.iso_code + ' · ' + row.name, () => {
+        $('code').value = row.iso_code;
+        $('add-form').requestSubmit();
+      });
+    }
+  }
+  codeOption('Add ' + code + ' manually', () => addCurrency(code, ''));
+  $('code-options').firstElementChild.focus();
 });
 $('reset').addEventListener('click', () => {
   draft = clone(defaults);

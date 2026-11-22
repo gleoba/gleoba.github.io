@@ -7,7 +7,11 @@ In [Currency Converter v2](currency-v2.html), **Local amount** accepts up to eig
 
 Typing or pasting an invalid amount keeps the previous entry and its calculations. This limit applies only to the local amount. Exchange rates retain their precision.
 
-Converted amounts show the rate per unit of local currency rounded to two decimal places. Each colored tip row shows the percentage, tip, total, and local currency symbol.
+Converted amounts show the rate per unit of local currency rounded to two decimal places. In the Tip assistant, read down the **Tip** column to compare tips or the **Total** column to compare final amounts. A centered dot separates the two, and the local currency symbol appears on the right.
+
+In **Configure → Add currency**, enter a currency code and its rate per unit of local currency. **Add** checks the code against Frankfurter’s catalog. For example, entering `RU` offers **Use RUB · Russian Ruble**. Choosing it keeps the entered rate and uses ₽ for the ruble. If the code is unsupported or the catalog is unavailable, choose **Add … manually** to use your own rate.
+
+Use **Fetch latest rates** to update supported currencies in the draft. **Save & return** applies the changes; **Cancel** discards them.
 
 ## ROADMAP
 
