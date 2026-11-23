@@ -27,11 +27,15 @@
       max-inline-size: 64rem; margin-inline: auto;
       padding: clamp(.875rem, 3vw, 2rem);
     }
-    header, .actions, .result-row, .rates-toolbar {
+    .actions, .result-row, .rates-toolbar {
       display: flex; align-items: center; justify-content: space-between;
       flex-wrap: wrap; gap: .75rem;
     }
-    header { padding-block-end: 1rem; border-block-end: 1px solid var(--line); }
+    header {
+      display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: .75rem;
+      padding-block-end: 1rem; border-block-end: 1px solid var(--line);
+    }
+    #configure { inline-size: max(44px, 2.75rem); padding: 0; font-size: 1.125rem; }
     header p, footer, .hint, small { color: var(--soft); }
     p, h1, h2, ul { margin: 0; }
     h1, h2 { text-wrap: balance; line-height: 1.2; overflow-wrap: anywhere; }
@@ -118,6 +122,8 @@
     .notification button:hover { border-color: var(--ink); }
     .notification summary, .notification-title { padding-block: .625rem; }
     .notification summary { cursor: pointer; }
+    .notification ul { list-style: disc; padding-inline-start: 1.25em; margin-block-end: .75rem; }
+    #notifications:has(#notice-release-v2 details[open]) { position: static; max-block-size: none; }
     .notification details p, .notification details a { margin-block-end: .5rem; }
     .notification a { display: inline-block; }
     .sr-only {
@@ -156,7 +162,7 @@
 <div class="app">
   <header>
     <div><h1 lang="ru">Валютная шпаргалка</h1><p>Currency &amp; Tip Calculator</p></div>
-    <button id="configure" type="button"><span id="configure-icon" aria-hidden="true">⚙️</span> <span id="configure-label">Configure</span></button>
+    <button id="configure" type="button" aria-label="Configure" title="Configure"><span id="configure-icon" aria-hidden="true">⚙️</span></button>
   </header>
   <main>
     <section id="notifications" aria-label="Notifications"></section>
@@ -268,7 +274,15 @@ function showNotice(key, title, {type = 'info', details, link} = {}) {
     const summary = document.createElement('summary');
     summary.textContent = label + title;
     content.append(summary);
-    if (details) {
+    if (Array.isArray(details)) {
+      const list = document.createElement('ul');
+      for (const text of details) {
+        const item = document.createElement('li');
+        item.textContent = text;
+        list.append(item);
+      }
+      content.append(list);
+    } else if (details) {
       const p = document.createElement('p');
       p.textContent = details;
       content.append(p);
@@ -276,6 +290,8 @@ function showNotice(key, title, {type = 'info', details, link} = {}) {
     if (link) {
       const a = document.createElement('a');
       a.href = link.href;
+      a.target = '_blank';
+      a.rel = 'noopener';
       a.textContent = link.text;
       content.append(a);
     }
@@ -586,14 +602,18 @@ function clearAdd() {
   errorFor($('code'), '');
   errorFor($('rate'), '');
 }
+function setConfigureButton(icon, label) {
+  $('configure-icon').textContent = icon;
+  $('configure').setAttribute('aria-label', label);
+  $('configure').title = label;
+}
 function closeSettings() {
   clearCodeFeedback();
   draft = undefined;
   resetRefresh();
   $('settings').hidden = true;
   $('calculator').hidden = false;
-  $('configure-icon').textContent = '⚙️';
-  $('configure-label').textContent = 'Configure';
+  setConfigureButton('⚙️', 'Configure');
   renderCalculator();
   $('configure').focus();
 }
@@ -608,8 +628,7 @@ $('configure').addEventListener('click', () => {
   renderSettings();
   $('calculator').hidden = true;
   $('settings').hidden = false;
-  $('configure-icon').textContent = '✕';
-  $('configure-label').textContent = 'Cancel';
+  setConfigureButton('✕', 'Cancel settings changes');
   clearNotice('settings');
   $('settings-heading').focus();
 });
@@ -737,12 +756,22 @@ $('rates-form').addEventListener('submit', event => {
   }
 });
 renderCalculator();
-showNotice('currency-suggestions', 'Currency code suggestions are available.', {
+showNotice('release-v2', 'Version 2 is here', {
   type: 'attention',
-  details: 'In Configure, try adding RU. Choose RUB from the suggestions to use the ruble symbol automatically.',
+  details: [
+    'Fetch the latest exchange rates in one tap. See the quote dates and keep your own rate when a quote is missing.',
+    'Bring your saved v1 currencies and rates with you automatically when you open v2 in the same browser.',
+    'Find currencies by code. Type RU to get RUB and its ₽ symbol, or add a currency manually when offline.',
+    'Compare the tip and final bill in aligned columns for each percentage, with the local currency symbol beside each total.',
+    'Read the rate beside each converted currency, rounded to two decimals. Calculations and saved rates keep their precision.',
+    'Enter amounts with a decimal comma or point, up to eight whole digits and two decimal places. An invalid edit keeps your previous amount.',
+    'Review rate changes and resets before saving. Cancel discards the draft, including any rates you just fetched.',
+    'Use the compact layout on a phone or see tips and conversions side by side on a wider screen. The gear opens settings on both.',
+    'See confirmations after saving and expand warnings or errors for next steps. Keyboard focus is visible and screen readers announce updates.'
+  ],
   link: {
-    href: 'https://github.com/gleoba/gleoba.github.io/blob/master/playground/README.md#currency-converter-v2',
-    text: 'Read the currency converter guide'
+    href: 'https://github.com/gleoba/gleoba.github.io/blob/master/playground/Currency-Converter-readme.md#v2',
+    text: 'Read the currency converter guide (opens in a new tab)'
   }
 });
 </script>
