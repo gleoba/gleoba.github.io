@@ -1,0 +1,18 @@
+name: Publish currency release channels
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy:
+    if: startsWith(github.event.release.tag_name, 'currency-v')
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      # Pages permits deployments from master. The site build reads the tagged HTML.
+      - name: Dispatch the Pages workflow on master
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run hugo.yaml --repo "$GITHUB_REPOSITORY" --ref master
