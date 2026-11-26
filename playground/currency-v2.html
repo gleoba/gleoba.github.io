@@ -330,11 +330,12 @@ function showNotice(key, title, {type = 'info', details, link} = {}) {
     scheduleDismissal();
   }
 }
+// Units per USD from https://api.frankfurter.dev/v2/rates?base=USD&date=2026-11-26
 const defaults = {
   base: 'CZK',
   currencies: [
-    {code: 'CZK', rate: 20.7952, symbol: 'Kč'}, {code: 'ILS', rate: 2.9805, symbol: '₪'},
-    {code: 'EUR', rate: 0.861, symbol: '€'}, {code: 'USD', rate: 1, symbol: '$'}
+    {code: 'CZK', rate: 22.319, symbol: 'Kč'}, {code: 'ILS', rate: 3.3631, symbol: '₪'},
+    {code: 'EUR', rate: 0.91312, symbol: '€'}, {code: 'USD', rate: 1, symbol: '$'}
   ]
 };
 const storageKey = 'travelmate_converter_v7';
@@ -617,6 +618,7 @@ function closeSettings() {
   renderCalculator();
   $('configure').focus();
 }
+let firstSettingsVisit = true;
 $('configure').addEventListener('click', () => {
   if (draft) {
     closeSettings();
@@ -631,6 +633,13 @@ $('configure').addEventListener('click', () => {
   setConfigureButton('✕', 'Cancel settings changes');
   clearNotice('settings');
   $('settings-heading').focus();
+  if (firstSettingsVisit) {
+    firstSettingsVisit = false;
+    const action = refreshButton.disabled
+      ? 'Add another currency, then select Fetch latest rates.'
+      : 'Select Fetch latest rates to update them.';
+    showNotice('rates', 'Exchange rates may be out of date. ' + action, {type: 'attention'});
+  }
 });
 $('base').addEventListener('change', () => {
   if (!readRateEdits()) {
