@@ -63,6 +63,11 @@ Plan work in the version milestone, develop it on a feature branch, and attach i
 
 ## Changelog
 
+### November 26, 2026 — v2.0.0 beta 2
+
+- New installs and **Reset to defaults** use the November 26 reference rates. One USD buys 22.319 CZK, 3.3631 ILS, or 0.91312 EUR. Existing settings keep their saved rates. [Dated Frankfurter quotes](https://api.frankfurter.dev/v2/rates?base=USD&date=2026-11-26&quotes=CZK,ILS,EUR)
+- The first time you open **Configure** after loading the page, a reminder points to **Fetch latest rates**. Reloading the page makes the reminder available again. [Issue #8](https://github.com/gleoba/gleoba.github.io/issues/8)
+
 ### November 26, 2026 — Stable and preview channels
 
 - Recorded the original v1 commit as the stable release and the mobile-verified v2 commit as a beta. The dates above record the original Pages deployments. [v1.0.0 release](https://github.com/gleoba/gleoba.github.io/releases/tag/currency-v1.0.0) · [v2.0.0 beta 1 pre-release](https://github.com/gleoba/gleoba.github.io/releases/tag/currency-v2.0.0-beta.1)
