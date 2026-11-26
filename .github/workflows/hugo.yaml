@@ -5,7 +5,7 @@ on:
   # Runs on pushes targeting the default branch
   push:
     branches:
-      - main
+      - master
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -82,11 +82,20 @@ jobs:
             --baseURL "${{ steps.pages.outputs.base_url }}/" \
             --cacheDir "${{ runner.temp }}/hugo_cache"
 
-      - name: Copy static HTML files to public
+      - name: Copy playground HTML files and their directories
+        working-directory: playground
         run: |
-          mkdir -p ./public/playground
-          find . -type f -name '*.html' -exec cp --parents -t ../public/playground -- {} +
-      
+          mkdir -p ../public/playground
+          find . -type f -name '*.html' ! -path './currency.html' ! -path './currency-v[0-9]*.html' \
+            -exec cp --parents -t ../public/playground -- {} +
+
+      - name: Publish tagged calculator versions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/releases?per_page=100" |
+            python3 .github/scripts/stage-currency.py
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
         with:

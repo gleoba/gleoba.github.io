@@ -4,7 +4,7 @@
 
 ## Currency Converter
 
-[Calculator guide, v1 and v2 release history, and roadmap](Currency-Converter-readme.md)
+[Calculator guide, v1 and v2 release history, and changelog](Currency-Converter-readme.md)
 
 ## ROADMAP
 

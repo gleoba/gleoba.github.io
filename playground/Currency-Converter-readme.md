@@ -2,10 +2,12 @@
 
 Enter a bill in the local currency to see its value in your other currencies and compare four tip options. Both versions run in your browser and save settings on the device.
 
-| Version | Original release on GitHub Pages | Calculator |
+| Version | First appearance on GitHub Pages | Calculator |
 | --- | --- | --- |
-| [v1](#v1) | [August 29, 2026](https://github.com/gleoba/gleoba.github.io/actions/runs/33259238598/job/99118279725) | [Open v1](https://gleoba.github.io/playground/currency.html) |
-| [v2](#v2) | [November 22, 2026](https://github.com/gleoba/gleoba.github.io/actions/runs/45032462118/job/137239038369) | [Open v2](https://gleoba.github.io/playground/currency-v2.html) |
+| [v1](#v1) | [August 29, 2026](https://github.com/gleoba/gleoba.github.io/actions/runs/33259238598/job/99118279725) | [Open v1.0.0 archive](https://gleoba.github.io/playground/versions/currency-v1.0.0.html) |
+| [v2](#v2) | [November 22, 2026](https://github.com/gleoba/gleoba.github.io/actions/runs/45032462118/job/137239038369) | [Open preview](https://gleoba.github.io/playground/preview/currency.html) |
+
+[Open the stable calculator](https://gleoba.github.io/playground/currency.html) · [Read the changelog](#changelog)
 
 ## v1
 
@@ -16,6 +18,8 @@ The original calculator pairs instant conversions with manually maintained excha
 - **Manage currencies.** Choose **Configure** to change the local currency, add or remove currencies, and edit rates by hand. **Save & Return** keeps edits in this browser. **Cancel** discards ordinary edits. To restore the original currencies and rates, tap **Reset to Defaults** twice to confirm.
 
 ## v2
+
+**Preview.** V2 has been verified on mobile and is available for testing. The installed calculator URL currently serves v1.
 
 V2 adds on-demand rate updates and currency lookup. The current version also makes totals easier to compare and explains what happened when a lookup or save fails. [Original v2 pull request](https://github.com/gleoba/gleoba.github.io/pull/3) · [Subsequent improvements](https://github.com/gleoba/gleoba.github.io/pull/4)
 
@@ -47,3 +51,20 @@ The notification bar appears below the header on both screens. Select a message 
 | **Error** (red) | Explains a failed operation and how to recover, such as retrying a fetch or entering rates manually. |
 
 Warnings and errors remain available until dismissed or until the affected operation is retried or superseded. Screen readers announce updates, and the disclosure and dismiss controls work with a keyboard.
+
+## Release process
+
+Plan work in the version milestone, develop it on a feature branch, and attach its PRs to the milestone. Use the `currency` label for the app and `preview` or `stable` for the release stage. The [v1 milestone](https://github.com/gleoba/gleoba.github.io/milestone/1) is closed. The [v2 milestone](https://github.com/gleoba/gleoba.github.io/milestone/2) stays open through [stable promotion](https://github.com/gleoba/gleoba.github.io/issues/6).
+
+1. Tag the tested commit using `currency-vMAJOR.MINOR.PATCH`. For a test build, append `-alpha.N`, `-beta.N`, or `-rc.N` and publish it as a GitHub **pre-release**. The tagged commit supplies `playground/currency-vMAJOR.html`. Historical v1 uses `playground/currency.html`.
+2. Publishing a Currency Release dispatches the Pages workflow on `master`. Every deployment builds the whole site and selects the highest stable currency version for `/playground/currency.html`. The preview URL serves the highest version including pre-releases. A final release takes precedence over a pre-release of the same version.
+3. To promote a verified build, publish a stable tag at that commit. Every stable build also has a permanent archive at `/playground/versions/currency-vMAJOR.MINOR.PATCH.html`. Check the installed URL and close the milestone after promotion.
+4. For a retrospective tag whose commit predates the release workflow, run **Deploy gleoba.github.io site to GitHub Pages** on `master` manually. A manual run uses the same release selection rules.
+
+## Changelog
+
+### November 26, 2026 — Stable and preview channels
+
+- Recorded the original v1 commit as the stable release and the mobile-verified v2 commit as a beta. The dates above record the original Pages deployments. [v1.0.0 release](https://github.com/gleoba/gleoba.github.io/releases/tag/currency-v1.0.0) · [v2.0.0 beta 1 pre-release](https://github.com/gleoba/gleoba.github.io/releases/tag/currency-v2.0.0-beta.1)
+- Kept existing installations on v1 at `/playground/currency.html` and moved v2 testing to `/playground/preview/currency.html`. The playground links to both.
+- Updated the Pages build to preserve playground subdirectories and include the stable calculator, preview, and stable archives in each site deployment.
