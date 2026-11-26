@@ -5,7 +5,7 @@ Enter a bill in the local currency to see its value in your other currencies and
 | Version | First appearance on GitHub Pages | Calculator |
 | --- | --- | --- |
 | [v1](#v1) | [August 29, 2026](https://github.com/gleoba/gleoba.github.io/actions/runs/33259238598/job/99118279725) | [Open v1.0.0 archive](https://gleoba.github.io/playground/versions/currency-v1.0.0.html) |
-| [v2](#v2) | [November 22, 2026](https://github.com/gleoba/gleoba.github.io/actions/runs/45032462118/job/137239038369) | [Open preview](https://gleoba.github.io/playground/preview/currency.html) |
+| [v2](#v2) | [November 22, 2026](https://github.com/gleoba/gleoba.github.io/actions/runs/45032462118/job/137239038369) | [Open v2.0.0 archive](https://gleoba.github.io/playground/versions/currency-v2.0.0.html) |
 
 [Open the stable calculator](https://gleoba.github.io/playground/currency.html) · [Read the changelog](#changelog)
 
@@ -19,7 +19,7 @@ The original calculator pairs instant conversions with manually maintained excha
 
 ## v2
 
-**Preview.** V2 has been verified on mobile and is available for testing. The installed calculator URL currently serves v1.
+**Stable since November 26, 2026.** Reopen or refresh your existing calculator shortcut to use v2. Its address stays the same. [Open the calculator](https://gleoba.github.io/playground/currency.html)
 
 V2 adds on-demand rate updates and currency lookup. The current version also makes totals easier to compare and explains what happened when a lookup or save fails. [Original v2 pull request](https://github.com/gleoba/gleoba.github.io/pull/3) · [Subsequent improvements](https://github.com/gleoba/gleoba.github.io/pull/4)
 
@@ -28,7 +28,7 @@ V2 adds on-demand rate updates and currency lookup. The current version also mak
 
 ### Fetch rates and add currencies
 
-1. Open **Configure** using the gear in the upper-right corner. Select your local currency.
+1. Open **Configure** using the gear in the upper-right corner. The first visit after each page load reminds you that exchange rates may be out of date. Select your local currency.
 2. Choose **Fetch latest rates** to get Frankfurter reference rates for the currencies in your list. The result shows the quote dates. If a quote is missing, your existing entry is kept. You can also enter rates manually.
 3. To add a currency, enter its code and its rate per unit of local currency, then choose **Add**. For example, entering `RU` offers **Use RUB · Russian Ruble** and fills in **₽** when selected. If the code is unsupported or the catalog is unavailable, choose **Add … manually**.
 4. Choose **Save & return** to apply the draft or **✕** to cancel. Fetched rates and **Reset to defaults** take effect when you save.
@@ -54,7 +54,7 @@ Warnings and errors remain available until dismissed or until the affected opera
 
 ## Release process
 
-Plan work in the version milestone, develop it on a feature branch, and attach its PRs to the milestone. Use the `currency` label for the app and `preview` or `stable` for the release stage. The [v1 milestone](https://github.com/gleoba/gleoba.github.io/milestone/1) is closed. The [v2 milestone](https://github.com/gleoba/gleoba.github.io/milestone/2) stays open through [stable promotion](https://github.com/gleoba/gleoba.github.io/issues/6).
+Plan work in the version milestone, develop it on a feature branch, and attach its PRs to the milestone. Use the `currency` label for the app and `preview` or `stable` for the release stage. The [v1 milestone](https://github.com/gleoba/gleoba.github.io/milestone/1) is closed. The [v2 milestone](https://github.com/gleoba/gleoba.github.io/milestone/2) records the preview work and [stable promotion](https://github.com/gleoba/gleoba.github.io/issues/6).
 
 1. Tag the tested commit using `currency-vMAJOR.MINOR.PATCH`. For a test build, append `-alpha.N`, `-beta.N`, or `-rc.N` and publish it as a GitHub **pre-release**. The tagged commit supplies `playground/currency-vMAJOR.html`. Historical v1 uses `playground/currency.html`.
 2. Publishing a Currency Release dispatches the Pages workflow on `master`. Every deployment builds the whole site and selects the highest stable currency version for `/playground/currency.html`. The preview URL serves the highest version including pre-releases. A final release takes precedence over a pre-release of the same version.
@@ -62,6 +62,12 @@ Plan work in the version milestone, develop it on a feature branch, and attach i
 4. For a retrospective tag whose commit predates the release workflow, run **Deploy gleoba.github.io site to GitHub Pages** on `master` manually. A manual run uses the same release selection rules.
 
 ## Changelog
+
+### November 26, 2026 — v2.0.0 stable
+
+- Promoted the accepted beta 2 build to the installed calculator URL. Existing v1 users can refresh to pick up v2 with their saved base currency, rates, and currency list. [Stable release](https://github.com/gleoba/gleoba.github.io/releases/tag/currency-v2.0.0)
+- V2 adds on-demand Frankfurter rates, currency-code suggestions and symbols, aligned tip and total columns, and expandable notifications. Rate updates can be reviewed before saving.
+- Mobile verification and acceptance of the updated defaults and first-open reminder completed the v2 preview. The stable release and beta 2 both point to commit `84446f1`. [Issue #8](https://github.com/gleoba/gleoba.github.io/issues/8) · [PR #9](https://github.com/gleoba/gleoba.github.io/pull/9)
 
 ### November 26, 2026 — v2.0.0 beta 2
 
